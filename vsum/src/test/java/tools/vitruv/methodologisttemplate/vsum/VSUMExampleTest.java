@@ -1,5 +1,6 @@
 package tools.vitruv.methodologisttemplate.vsum;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
@@ -9,12 +10,14 @@ import java.util.function.Function;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.xmi.impl.XMIResourceFactoryImpl;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import mir.reactions.model2Model2.Model2Model2ChangePropagationSpecification;
+import tools.vitruv.change.atomic.command.internal.ApplyEChangeSwitch;
 import tools.vitruv.change.propagation.ChangePropagationMode;
 import tools.vitruv.change.testutils.TestUserInteraction;
 import tools.vitruv.framework.views.CommittableView;
@@ -31,10 +34,18 @@ import tools.vitruv.methodologisttemplate.model.model2.Root;
  * This class provides an example how to define and use a VSUM.
  */
 public class VSUMExampleTest {
+  private static final AtomicEChangeTimeObserver eChangeObserver = new AtomicEChangeTimeObserver();
 
   @BeforeAll
   static void setup() {
     Resource.Factory.Registry.INSTANCE.getExtensionToFactoryMap().put("*", new XMIResourceFactoryImpl());
+    ApplyEChangeSwitch.registerObserver(eChangeObserver);
+  }
+
+  @AfterAll
+  static void tearDown() throws IOException {
+    ApplyEChangeSwitch.deregisterObserver(eChangeObserver);
+    eChangeObserver.printResultsTo("results.csv");
   }
 
   @Test
