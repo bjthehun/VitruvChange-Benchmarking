@@ -35,6 +35,7 @@ import tools.vitruv.methodologisttemplate.model.model2.Root;
  */
 public class VSUMExampleTest {
   private static final AtomicEChangeTimeObserver eChangeObserver = new AtomicEChangeTimeObserver();
+  private static final VitruvChangeTimeObserver vitruvChangeObserver = new VitruvChangeTimeObserver();
 
   @BeforeAll
   static void setup() {
@@ -45,7 +46,8 @@ public class VSUMExampleTest {
   @AfterAll
   static void tearDown() throws IOException {
     ApplyEChangeSwitch.deregisterObserver(eChangeObserver);
-    eChangeObserver.printResultsTo("results.csv");
+    eChangeObserver.printResultsTo("results_echange.csv");
+    vitruvChangeObserver.printResultsTo("results_vitruviuschange.csv");
   }
 
   @Test
@@ -221,6 +223,7 @@ public class VSUMExampleTest {
         .withChangePropagationSpecifications(new Model2Model2ChangePropagationSpecification())
         .buildAndInitialize();
     model.setChangePropagationMode(ChangePropagationMode.TRANSITIVE_CYCLIC);
+    model.addChangePropagationListener(vitruvChangeObserver);
     return model;
   }
 
