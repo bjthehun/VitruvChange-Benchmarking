@@ -20,14 +20,18 @@ public class VitruvChangeTimeObserver extends TimeObserver<Triple<Long, Long, Lo
   @Override
   public void finishedChangePropagation(Iterable<PropagatedChange> propagatedChanges) {
     var time = stopTiming();
-    var eChangesRequired = delegateEChangeObserver.eChangeCounter - eChangeCounter;
+    long eChangesRequired = delegateEChangeObserver.eChangeCounter;
+    for (var change : propagatedChanges) {
+      eChangesRequired += change.getConsequentialChanges().getEChanges().size();
+      eChangesRequired += change.getOriginalChange().getEChanges().size();
+    };
     timesPerChangeType.add(new Triple<Long,Long,Long>(vitruviusChangeCounter, eChangesRequired, time));
     vitruviusChangeCounter += 1;
   }
 
   @Override
   public void startedChangePropagation(VitruviusChange<Uuid> originalChange) {
-    eChangeCounter = delegateEChangeObserver.eChangeCounter;
+    eChangeCounter = originalChange.getEChanges().size();
     startTiming();
   }
 
