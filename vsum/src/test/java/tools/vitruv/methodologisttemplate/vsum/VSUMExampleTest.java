@@ -13,6 +13,7 @@ import org.eclipse.emf.ecore.xmi.impl.XMIResourceFactoryImpl;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -26,6 +27,7 @@ import tools.vitruv.framework.views.ViewTypeFactory;
 import tools.vitruv.framework.vsum.VirtualModel;
 import tools.vitruv.framework.vsum.VirtualModelBuilder;
 import tools.vitruv.framework.vsum.internal.InternalVirtualModel;
+import tools.vitruv.framework.vsum.internal.VirtualModelImpl;
 import tools.vitruv.methodologisttemplate.model.model.ModelFactory;
 import tools.vitruv.methodologisttemplate.model.model.System;
 import tools.vitruv.methodologisttemplate.model.model2.Root;
@@ -34,8 +36,11 @@ import tools.vitruv.methodologisttemplate.model.model2.Root;
  * This class provides an example how to define and use a VSUM.
  */
 public class VSUMExampleTest {
+  private static final int noOfTests = 16;
+
   private static final AtomicEChangeTimeObserver eChangeObserver = new AtomicEChangeTimeObserver();
-  private static final VitruvChangeTimeObserver vitruvChangeObserver = new VitruvChangeTimeObserver();
+  private static final VitruvChangeTimeObserver vitruvChangeObserver = new VitruvChangeTimeObserver(eChangeObserver);
+  private static final ConsistencyPreservationRuleTimeObserver cprObserver = new ConsistencyPreservationRuleTimeObserver(eChangeObserver);
 
   @BeforeAll
   static void setup() {
@@ -47,17 +52,11 @@ public class VSUMExampleTest {
   static void tearDown() throws IOException {
     ApplyEChangeSwitch.deregisterObserver(eChangeObserver);
     eChangeObserver.printResultsTo("results_echange.csv");
+    cprObserver.printResultsTo("results_cprs.csv");
     vitruvChangeObserver.printResultsTo("results_vitruviuschange.csv");
   }
 
-  @Test
-  void reloadEmptyVirtualModel(@TempDir Path tempDir) {
-    InternalVirtualModel vsum = createDefaultVirtualModel(tempDir);
-    vsum.dispose();
-    vsum = createDefaultVirtualModel(tempDir);
-  }
-
-  @Test
+  @RepeatedTest(noOfTests)
   void reloadFilledVirtualModel(@TempDir Path tempDir) {
     InternalVirtualModel vsum = createDefaultVirtualModel(tempDir);
     addSystem(vsum, tempDir);
@@ -68,7 +67,7 @@ public class VSUMExampleTest {
     Assertions.assertEquals(1, getDefaultView(vsum, List.of(Root.class)).getRootObjects().size());
   }
 
-  @Test
+  @RepeatedTest(noOfTests)
   void systemInsertionAndPropagationTest(@TempDir Path tempDir) {
     VirtualModel vsum = createDefaultVirtualModel(tempDir);
     addSystem(vsum, tempDir);
@@ -79,7 +78,7 @@ public class VSUMExampleTest {
     Assertions.assertEquals(1, getDefaultView(vsum, List.of(Root.class)).getRootObjects().size());
   }
 
-  @Test
+  @RepeatedTest(noOfTests)
   void insertComponent(@TempDir Path tempDir) {
     InternalVirtualModel vsum = createDefaultVirtualModel(tempDir);
     addSystem(vsum, tempDir);
@@ -96,7 +95,7 @@ public class VSUMExampleTest {
     }));
   }
 
-  @Test
+  @RepeatedTest(noOfTests)
   void insertRouter(@TempDir Path tempDir) {
     InternalVirtualModel vsum = createDefaultVirtualModel(tempDir);
     addSystem(vsum, tempDir);
@@ -115,7 +114,7 @@ public class VSUMExampleTest {
     }));
   }
 
-  @Test
+  @RepeatedTest(noOfTests)
   void renameComponent(@TempDir Path tempDir) {
     final String newName = "newName";
     VirtualModel vsum = createDefaultVirtualModel(tempDir);
@@ -135,7 +134,7 @@ public class VSUMExampleTest {
     }));
   }
 
-  @Test
+  @RepeatedTest(noOfTests)
   void deleteComponent(@TempDir Path tempDir) {
     VirtualModel vsum = createDefaultVirtualModel(tempDir);
     addSystem(vsum, tempDir);
@@ -151,7 +150,7 @@ public class VSUMExampleTest {
     }));
   }
 
-  @Test
+  @RepeatedTest(noOfTests)
   void testLink(@TempDir Path tempDir) {
     VirtualModel vsum = createDefaultVirtualModel(tempDir);
     addSystem(vsum, tempDir);
@@ -217,12 +216,13 @@ public class VSUMExampleTest {
   }
 
   private InternalVirtualModel createDefaultVirtualModel(Path projectPath) {
-    InternalVirtualModel model = new VirtualModelBuilder()
+    VirtualModelImpl model = (VirtualModelImpl) new VirtualModelBuilder()
         .withStorageFolder(projectPath)
         .withUserInteractorForResultProvider(new TestUserInteraction.ResultProvider(new TestUserInteraction()))
         .withChangePropagationSpecifications(new Model2Model2ChangePropagationSpecification())
         .buildAndInitialize();
     model.setChangePropagationMode(ChangePropagationMode.TRANSITIVE_CYCLIC);
+    model.registerObserver(cprObserver);
     model.addChangePropagationListener(vitruvChangeObserver);
     return model;
   }
