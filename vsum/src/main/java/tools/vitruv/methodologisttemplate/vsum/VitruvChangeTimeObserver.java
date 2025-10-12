@@ -20,7 +20,7 @@ public class VitruvChangeTimeObserver extends TimeObserver<Triple<Long, Long, Lo
   @Override
   public void finishedChangePropagation(Iterable<PropagatedChange> propagatedChanges) {
     var time = stopTiming();
-    long eChangesRequired = delegateEChangeObserver.eChangeCounter;
+    long eChangesRequired = eChangeCounter;
     for (var change : propagatedChanges) {
       eChangesRequired += change.getConsequentialChanges().getEChanges().size();
       eChangesRequired += change.getOriginalChange().getEChanges().size();

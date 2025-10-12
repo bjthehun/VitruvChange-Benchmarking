@@ -13,7 +13,9 @@ import org.eclipse.emf.ecore.xmi.impl.XMIResourceFactoryImpl;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.RepeatedTest;
+import org.junit.jupiter.api.RepetitionInfo;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -36,7 +38,8 @@ import tools.vitruv.methodologisttemplate.model.model2.Root;
  * This class provides an example how to define and use a VSUM.
  */
 public class VSUMExampleTest {
-  private static final int noOfTests = 16;
+  private static final int WARM_UP_RUNS = 15;
+  private static final int MEASUREMENT_RUNS = 15 + WARM_UP_RUNS;
 
   private static final AtomicEChangeTimeObserver eChangeObserver = new AtomicEChangeTimeObserver();
   private static final VitruvChangeTimeObserver vitruvChangeObserver = new VitruvChangeTimeObserver(eChangeObserver);
@@ -48,6 +51,21 @@ public class VSUMExampleTest {
     ApplyEChangeSwitch.registerObserver(eChangeObserver);
   }
 
+  @BeforeEach
+  void decideAboutAcceptingMeasurement(RepetitionInfo repetitionInfo) {
+    var runsForTest = repetitionInfo.getCurrentRepetition();
+    if (runsForTest <= WARM_UP_RUNS) {
+      eChangeObserver.rejectMeasurement();
+      vitruvChangeObserver.rejectMeasurement();
+      cprObserver.rejectMeasurement();
+    }
+    else {
+      eChangeObserver.acceptMeasurement();
+      vitruvChangeObserver.acceptMeasurement();
+      cprObserver.acceptMeasurement();
+    }
+  }
+
   @AfterAll
   static void tearDown() throws IOException {
     ApplyEChangeSwitch.deregisterObserver(eChangeObserver);
@@ -56,7 +74,7 @@ public class VSUMExampleTest {
     vitruvChangeObserver.printResultsTo("results_vitruviuschange.csv");
   }
 
-  @RepeatedTest(noOfTests)
+  @RepeatedTest(MEASUREMENT_RUNS)
   void reloadFilledVirtualModel(@TempDir Path tempDir) {
     InternalVirtualModel vsum = createDefaultVirtualModel(tempDir);
     addSystem(vsum, tempDir);
@@ -67,7 +85,7 @@ public class VSUMExampleTest {
     Assertions.assertEquals(1, getDefaultView(vsum, List.of(Root.class)).getRootObjects().size());
   }
 
-  @RepeatedTest(noOfTests)
+  @RepeatedTest(MEASUREMENT_RUNS)
   void systemInsertionAndPropagationTest(@TempDir Path tempDir) {
     VirtualModel vsum = createDefaultVirtualModel(tempDir);
     addSystem(vsum, tempDir);
@@ -78,7 +96,7 @@ public class VSUMExampleTest {
     Assertions.assertEquals(1, getDefaultView(vsum, List.of(Root.class)).getRootObjects().size());
   }
 
-  @RepeatedTest(noOfTests)
+  @RepeatedTest(MEASUREMENT_RUNS)
   void insertComponent(@TempDir Path tempDir) {
     InternalVirtualModel vsum = createDefaultVirtualModel(tempDir);
     addSystem(vsum, tempDir);
@@ -95,7 +113,7 @@ public class VSUMExampleTest {
     }));
   }
 
-  @RepeatedTest(noOfTests)
+  @RepeatedTest(MEASUREMENT_RUNS)
   void insertRouter(@TempDir Path tempDir) {
     InternalVirtualModel vsum = createDefaultVirtualModel(tempDir);
     addSystem(vsum, tempDir);
@@ -114,7 +132,7 @@ public class VSUMExampleTest {
     }));
   }
 
-  @RepeatedTest(noOfTests)
+  @RepeatedTest(MEASUREMENT_RUNS)
   void renameComponent(@TempDir Path tempDir) {
     final String newName = "newName";
     VirtualModel vsum = createDefaultVirtualModel(tempDir);
@@ -134,7 +152,7 @@ public class VSUMExampleTest {
     }));
   }
 
-  @RepeatedTest(noOfTests)
+  @RepeatedTest(MEASUREMENT_RUNS)
   void deleteComponent(@TempDir Path tempDir) {
     VirtualModel vsum = createDefaultVirtualModel(tempDir);
     addSystem(vsum, tempDir);
@@ -150,7 +168,7 @@ public class VSUMExampleTest {
     }));
   }
 
-  @RepeatedTest(noOfTests)
+  @RepeatedTest(MEASUREMENT_RUNS)
   void testLink(@TempDir Path tempDir) {
     VirtualModel vsum = createDefaultVirtualModel(tempDir);
     addSystem(vsum, tempDir);

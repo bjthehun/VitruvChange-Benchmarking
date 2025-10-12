@@ -15,6 +15,7 @@ public abstract class TimeObserver<T> {
   }
 
   protected List<T> timesPerChangeType = new LinkedList<>();
+  protected List<T> acceptedTimes = new LinkedList<>();
   protected long timestamp;
 
   protected abstract String[] getLineFor(T record);
@@ -27,11 +28,20 @@ public abstract class TimeObserver<T> {
     return System.nanoTime() - timestamp;
   }
 
+  public void acceptMeasurement() {
+    acceptedTimes.addAll(timesPerChangeType);
+    timesPerChangeType.clear();
+  }
+
+  public void rejectMeasurement() {
+    timesPerChangeType.clear();
+  }
+
   public void printResultsTo(String path) throws IOException {
     try (var writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(path)))) {
       writer.write(String.join(", ", headers));
       writer.newLine();
-      for (var record: timesPerChangeType) {
+      for (var record: acceptedTimes) {
         writer.write(String.join(", ", getLineFor(record)));
         writer.newLine();
       }
