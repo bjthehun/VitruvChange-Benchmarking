@@ -29,7 +29,7 @@
   </modules>
 
   <properties>
-    <vitruv.version>3.2.3-SNAPSHOT</vitruv.version>
+    <vitruv.version>3.2.3</vitruv.version>
     <vitruv-dsls.version>3.2.3-SNAPSHOT</vitruv-dsls.version>
   </properties>
 
