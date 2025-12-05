@@ -14,16 +14,12 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.RepetitionInfo;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInfo;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
 
 import mir.reactions.model2Model2.Model2Model2ChangePropagationSpecification;
-import tools.vitruv.change.atomic.command.internal.ApplyEChangeSwitch;
 import tools.vitruv.change.propagation.ChangePropagationMode;
 import tools.vitruv.change.testutils.TestUserInteraction;
 import tools.vitruv.framework.views.CommittableView;
@@ -42,29 +38,23 @@ import tools.vitruv.methodologisttemplate.model.model2.Root;
  */
 @ExtendWith(VitruvChangeTimingExtension.class)
 public class VSUMExampleTest {
-
- 
-  private static final AtomicEChangeTimeObserver eChangeObserver = new AtomicEChangeTimeObserver();
-  private static final VitruvChangeTimeObserver vitruvChangeObserver = new VitruvChangeTimeObserver(eChangeObserver);
-  private static final ConsistencyPreservationRuleTimeObserver cprObserver = new ConsistencyPreservationRuleTimeObserver(eChangeObserver);
+  private static final VitruvChangeTimeObserver vitruvChangeObserver = new VitruvChangeTimeObserver();
+  private static final ConsistencyPreservationRuleTimeObserver cprObserver = new ConsistencyPreservationRuleTimeObserver();
 
 
   @BeforeAll
   static void setup() {
     Resource.Factory.Registry.INSTANCE.getExtensionToFactoryMap().put("*", new XMIResourceFactoryImpl());
-    ApplyEChangeSwitch.registerObserver(eChangeObserver);
   }
 
   @AfterEach
   void decideAboutAcceptingMeasurement(RepetitionInfo repetitionInfo) {
     var runsForTest = repetitionInfo.getCurrentRepetition();
     if (runsForTest <= VitruvChangeTimingExtension.WARM_UP_RUNS) {
-      eChangeObserver.rejectMeasurement();
       vitruvChangeObserver.rejectMeasurement();
       cprObserver.rejectMeasurement();
     }
     else {
-      eChangeObserver.acceptMeasurement();
       vitruvChangeObserver.acceptMeasurement();
       cprObserver.acceptMeasurement();
     }
@@ -72,8 +62,6 @@ public class VSUMExampleTest {
 
   @AfterAll
   static void tearDown() throws IOException {
-    ApplyEChangeSwitch.deregisterObserver(eChangeObserver);
-    eChangeObserver.printResultsTo("results_echange.csv");
     cprObserver.printResultsTo("results_cprs.csv");
     vitruvChangeObserver.printResultsTo("results_vitruviuschange.csv");
   }

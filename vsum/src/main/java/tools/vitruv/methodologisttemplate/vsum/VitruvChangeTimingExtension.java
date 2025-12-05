@@ -13,9 +13,18 @@ import tools.vitruv.change.atomic.command.internal.ApplyEChangeSwitch;
  */
 public class VitruvChangeTimingExtension implements 
     BeforeAllCallback, AfterTestExecutionCallback, AfterAllCallback {
-  private final AtomicEChangeTimeObserver eChangeObserver = new AtomicEChangeTimeObserver();
-  private final VitruvChangeTimeObserver vitruvChangeObserver = new VitruvChangeTimeObserver(eChangeObserver);
-  private final ConsistencyPreservationRuleTimeObserver cprObserver = new ConsistencyPreservationRuleTimeObserver(eChangeObserver);
+  /**
+   * Observer for applying entire VitruvChanges (transactions).
+   */
+  private final VitruvChangeTimeObserver vitruvChangeObserver = new VitruvChangeTimeObserver();
+  /**
+   * Observer for applying consistency preservation rule changes.
+   */
+  private final ConsistencyPreservationRuleTimeObserver cprObserver = new ConsistencyPreservationRuleTimeObserver();
+  /**
+   * Name of the class extended with this extension.
+   */
+  private String extendedClassName;
   
   public static final int WARM_UP_RUNS = 15;
   public static final int MEASUREMENT_RUNS = 15 + WARM_UP_RUNS;
@@ -23,23 +32,22 @@ public class VitruvChangeTimingExtension implements
   private final Map<Method, Long> observedExecutions = new HashMap<>();
 
   /**
-   * De-configure observers; also print out results.
-   */
-  @Override
-  public void afterAll(ExtensionContext context) throws Exception {
-    ApplyEChangeSwitch.deregisterObserver(eChangeObserver);
-    eChangeObserver.printResultsTo("results_echange.csv");
-    cprObserver.printResultsTo("results_cprs.csv");
-    vitruvChangeObserver.printResultsTo("results_vitruviuschange.csv");
-  }
-
-  /**
    * Configure observers.
    */
   @Override
   public void beforeAll(ExtensionContext context) throws Exception {
-    ApplyEChangeSwitch.registerObserver(eChangeObserver);
+    extendedClassName = context.getDisplayName().toLowerCase();
   }
+
+  /**
+   * De-configure observers; also print out results.
+   */
+  @Override
+  public void afterAll(ExtensionContext context) throws Exception {
+    cprObserver.printResultsTo("results_" + extendedClassName + " _cprs.csv");
+    vitruvChangeObserver.printResultsTo("results_" + extendedClassName + "_vitruviuschange.csv");
+  }
+
 
   /**
    * Record how often a test has been executed.
@@ -57,12 +65,10 @@ public class VitruvChangeTimingExtension implements
     });
     observedExecutions.put(testMethod, callsToTestMethod);
     if (callsToTestMethod <= WARM_UP_RUNS) {
-      eChangeObserver.rejectMeasurement();
       cprObserver.rejectMeasurement();
       vitruvChangeObserver.rejectMeasurement();
     }
     else {
-      eChangeObserver.acceptMeasurement();
       cprObserver.acceptMeasurement();
       vitruvChangeObserver.acceptMeasurement();
     }

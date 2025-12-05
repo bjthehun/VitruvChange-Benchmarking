@@ -1,6 +1,10 @@
 package tools.vitruv.methodologisttemplate.vsum;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import edu.kit.ipd.sdq.commons.util.java.Triple;
+import tools.vitruv.change.atomic.EChange;
 import tools.vitruv.change.atomic.uuid.Uuid;
 import tools.vitruv.change.composite.description.PropagatedChange;
 import tools.vitruv.change.composite.description.VitruviusChange;
@@ -10,18 +14,22 @@ public class VitruvChangeTimeObserver extends TimeObserver<Triple<Long, Long, Lo
   private long vitruviusChangeCounter = 0;
   private long eChangeCounter = 0;
 
-  public VitruvChangeTimeObserver(AtomicEChangeTimeObserver delegateEChangeTimeObserver) {
-    super(new String[]{"VitruviusChangeCounter","NoOfEChanges", "Time"});
+  public VitruvChangeTimeObserver() {
+    super(new String[]{"VitruviusChangeCounter", "NoOfEChanges", "Time"});
   }
 
   @Override
   public void finishedChangePropagation(Iterable<PropagatedChange> propagatedChanges) {
     var time = stopTiming();
+    Set<EChange<?>> allEChanges = new HashSet<>();
     long eChangesRequired = eChangeCounter;
+
     for (var change : propagatedChanges) {
-      eChangesRequired += change.getConsequentialChanges().getEChanges().size();
-      eChangesRequired += change.getOriginalChange().getEChanges().size();
+      allEChanges.addAll(change.getOriginalChange().getEChanges());
+      allEChanges.addAll(change.getConsequentialChanges().getEChanges());
     };
+    eChangesRequired += allEChanges.size();
+
     timesPerChangeType.add(new Triple<Long,Long,Long>(vitruviusChangeCounter, eChangesRequired, time));
     vitruviusChangeCounter += 1;
   }
