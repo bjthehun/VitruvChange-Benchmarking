@@ -11,12 +11,15 @@ import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.xmi.impl.XMIResourceFactoryImpl;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.RepetitionInfo;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
 
 import mir.reactions.model2Model2.Model2Model2ChangePropagationSpecification;
@@ -37,13 +40,14 @@ import tools.vitruv.methodologisttemplate.model.model2.Root;
 /**
  * This class provides an example how to define and use a VSUM.
  */
+@ExtendWith(VitruvChangeTimingExtension.class)
 public class VSUMExampleTest {
-  private static final int WARM_UP_RUNS = 15;
-  private static final int MEASUREMENT_RUNS = 15 + WARM_UP_RUNS;
 
+ 
   private static final AtomicEChangeTimeObserver eChangeObserver = new AtomicEChangeTimeObserver();
   private static final VitruvChangeTimeObserver vitruvChangeObserver = new VitruvChangeTimeObserver(eChangeObserver);
   private static final ConsistencyPreservationRuleTimeObserver cprObserver = new ConsistencyPreservationRuleTimeObserver(eChangeObserver);
+
 
   @BeforeAll
   static void setup() {
@@ -51,10 +55,10 @@ public class VSUMExampleTest {
     ApplyEChangeSwitch.registerObserver(eChangeObserver);
   }
 
-  @BeforeEach
+  @AfterEach
   void decideAboutAcceptingMeasurement(RepetitionInfo repetitionInfo) {
     var runsForTest = repetitionInfo.getCurrentRepetition();
-    if (runsForTest <= WARM_UP_RUNS) {
+    if (runsForTest <= VitruvChangeTimingExtension.WARM_UP_RUNS) {
       eChangeObserver.rejectMeasurement();
       vitruvChangeObserver.rejectMeasurement();
       cprObserver.rejectMeasurement();
@@ -74,7 +78,7 @@ public class VSUMExampleTest {
     vitruvChangeObserver.printResultsTo("results_vitruviuschange.csv");
   }
 
-  @RepeatedTest(MEASUREMENT_RUNS)
+  @RepeatedTest(VitruvChangeTimingExtension.MEASUREMENT_RUNS)
   void reloadFilledVirtualModel(@TempDir Path tempDir) {
     InternalVirtualModel vsum = createDefaultVirtualModel(tempDir);
     addSystem(vsum, tempDir);
@@ -85,7 +89,7 @@ public class VSUMExampleTest {
     Assertions.assertEquals(1, getDefaultView(vsum, List.of(Root.class)).getRootObjects().size());
   }
 
-  @RepeatedTest(MEASUREMENT_RUNS)
+  @RepeatedTest(VitruvChangeTimingExtension.MEASUREMENT_RUNS)
   void systemInsertionAndPropagationTest(@TempDir Path tempDir) {
     VirtualModel vsum = createDefaultVirtualModel(tempDir);
     addSystem(vsum, tempDir);
@@ -96,7 +100,7 @@ public class VSUMExampleTest {
     Assertions.assertEquals(1, getDefaultView(vsum, List.of(Root.class)).getRootObjects().size());
   }
 
-  @RepeatedTest(MEASUREMENT_RUNS)
+  @RepeatedTest(VitruvChangeTimingExtension.MEASUREMENT_RUNS)
   void insertComponent(@TempDir Path tempDir) {
     InternalVirtualModel vsum = createDefaultVirtualModel(tempDir);
     addSystem(vsum, tempDir);
@@ -113,7 +117,7 @@ public class VSUMExampleTest {
     }));
   }
 
-  @RepeatedTest(MEASUREMENT_RUNS)
+  @RepeatedTest(VitruvChangeTimingExtension.MEASUREMENT_RUNS)
   void insertRouter(@TempDir Path tempDir) {
     InternalVirtualModel vsum = createDefaultVirtualModel(tempDir);
     addSystem(vsum, tempDir);
@@ -132,7 +136,7 @@ public class VSUMExampleTest {
     }));
   }
 
-  @RepeatedTest(MEASUREMENT_RUNS)
+  @RepeatedTest(VitruvChangeTimingExtension.MEASUREMENT_RUNS)
   void renameComponent(@TempDir Path tempDir) {
     final String newName = "newName";
     VirtualModel vsum = createDefaultVirtualModel(tempDir);
@@ -152,7 +156,7 @@ public class VSUMExampleTest {
     }));
   }
 
-  @RepeatedTest(MEASUREMENT_RUNS)
+  @RepeatedTest(VitruvChangeTimingExtension.MEASUREMENT_RUNS)
   void deleteComponent(@TempDir Path tempDir) {
     VirtualModel vsum = createDefaultVirtualModel(tempDir);
     addSystem(vsum, tempDir);
@@ -168,7 +172,7 @@ public class VSUMExampleTest {
     }));
   }
 
-  @RepeatedTest(MEASUREMENT_RUNS)
+  @RepeatedTest(VitruvChangeTimingExtension.MEASUREMENT_RUNS)
   void testLink(@TempDir Path tempDir) {
     VirtualModel vsum = createDefaultVirtualModel(tempDir);
     addSystem(vsum, tempDir);

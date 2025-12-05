@@ -30,7 +30,7 @@
 
   <properties>
     <vitruv.version>3.2.3-SNAPSHOT</vitruv.version>
-    <vitruv-dsls.version>3.2.2</vitruv-dsls.version>
+    <vitruv-dsls.version>3.2.3-SNAPSHOT</vitruv-dsls.version>
   </properties>
 
   <dependencyManagement>
