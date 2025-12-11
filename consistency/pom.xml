@@ -114,17 +114,13 @@
                         <version>${project.version}</version>
                     </dependency>
                     <dependency>
-                        <groupId>sdq-demo-metamodels</groupId>
-                        <artifactId>edu.kit.ipd.sdq.metamodels.autosar</artifactId>
-                        <version>1.9.0.202311201524</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>sdq-demo-metamodels</groupId>
-                        <artifactId>edu.kit.ipd.sdq.metamodels.simulink</artifactId>
-                        <version>1.9.0.202311201524</version>
+                        <groupId>${project.groupId}</groupId>
+                        <artifactId>tools.vitruv.methodologisttemplate.p2-wrapper</artifactId>
+                        <version>${project.version}</version>
                     </dependency>
                 </dependencies>
             </plugin>
         </plugins>
     </build>
+
 </project>
