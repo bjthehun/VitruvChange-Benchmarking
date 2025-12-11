@@ -1,4 +1,4 @@
-package tools.vitruv.methodologisttemplate.vsum;
+package tools.vitruv.methodologisttemplate.vsum.observers;
 
 import tools.vitruv.framework.vsum.VirtualModelBuilder;
 import tools.vitruv.methodologisttemplate.model.model.ModelFactory;

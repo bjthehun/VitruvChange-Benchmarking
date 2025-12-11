@@ -1,4 +1,4 @@
-package tools.vitruv.methodologisttemplate.vsum;
+package tools.vitruv.methodologisttemplate.vsum.observers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -76,7 +76,7 @@ public class ResourceAccessObserver
     }
 
 
-    protected ResourceAccessObserver() {
+    public ResourceAccessObserver() {
         super(new String[]{ "Number", "Time", "Resource", "NoOfElements", "Type" });
     }
 

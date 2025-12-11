@@ -32,6 +32,10 @@ import tools.vitruv.framework.vsum.internal.VirtualModelImpl;
 import tools.vitruv.methodologisttemplate.model.model.ModelFactory;
 import tools.vitruv.methodologisttemplate.model.model.System;
 import tools.vitruv.methodologisttemplate.model.model2.Root;
+import tools.vitruv.methodologisttemplate.vsum.observers.ConsistencyPreservationRuleTimeObserver;
+import tools.vitruv.methodologisttemplate.vsum.observers.ResourceAccessObserver;
+import tools.vitruv.methodologisttemplate.vsum.observers.VitruvChangeTimeObserver;
+import tools.vitruv.methodologisttemplate.vsum.observers.VitruvChangeTimingExtension;
 
 /**
  * This class provides an example how to define and use a VSUM.

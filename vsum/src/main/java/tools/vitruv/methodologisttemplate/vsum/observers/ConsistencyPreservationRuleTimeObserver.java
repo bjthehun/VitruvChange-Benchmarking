@@ -1,4 +1,4 @@
-package tools.vitruv.methodologisttemplate.vsum;
+package tools.vitruv.methodologisttemplate.vsum.observers;
 
 import org.eclipse.emf.ecore.EObject;
 

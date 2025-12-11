@@ -1,4 +1,4 @@
-package tools.vitruv.methodologisttemplate.vsum;
+package tools.vitruv.methodologisttemplate.vsum.observers;
 
 import java.util.HashSet;
 import java.util.Set;
