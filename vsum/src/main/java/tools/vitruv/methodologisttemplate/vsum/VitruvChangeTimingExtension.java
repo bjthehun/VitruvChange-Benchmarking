@@ -6,7 +6,6 @@ import java.util.Map;
 
 import org.junit.jupiter.api.extension.*;
 
-import tools.vitruv.change.atomic.command.internal.ApplyEChangeSwitch;
 
 /**
  * A JUnit extension that can be added to test cases that work with a V-SUM.
@@ -21,6 +20,10 @@ public class VitruvChangeTimingExtension implements
    * Observer for applying consistency preservation rule changes.
    */
   private final ConsistencyPreservationRuleTimeObserver cprObserver = new ConsistencyPreservationRuleTimeObserver();
+  /**
+   * Observers for I/O operations (loading, saving, deleting resources).
+   */
+  private final ResourceAccessObserver accessObserver = new ResourceAccessObserver();
   /**
    * Name of the class extended with this extension.
    */
@@ -46,6 +49,7 @@ public class VitruvChangeTimingExtension implements
   public void afterAll(ExtensionContext context) throws Exception {
     cprObserver.printResultsTo("results_" + extendedClassName + " _cprs.csv");
     vitruvChangeObserver.printResultsTo("results_" + extendedClassName + "_vitruviuschange.csv");
+    accessObserver.printResultsTo("results_" + extendedClassName + "_resourceaccess.csv");
   }
 
 
@@ -67,10 +71,12 @@ public class VitruvChangeTimingExtension implements
     if (callsToTestMethod <= WARM_UP_RUNS) {
       cprObserver.rejectMeasurement();
       vitruvChangeObserver.rejectMeasurement();
+      accessObserver.rejectMeasurement();
     }
     else {
       cprObserver.acceptMeasurement();
       vitruvChangeObserver.acceptMeasurement();
+      accessObserver.acceptMeasurement();
     }
   }
 }

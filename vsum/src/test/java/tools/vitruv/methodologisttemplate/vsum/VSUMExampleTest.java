@@ -40,6 +40,7 @@ import tools.vitruv.methodologisttemplate.model.model2.Root;
 public class VSUMExampleTest {
   private static final VitruvChangeTimeObserver vitruvChangeObserver = new VitruvChangeTimeObserver();
   private static final ConsistencyPreservationRuleTimeObserver cprObserver = new ConsistencyPreservationRuleTimeObserver();
+  private static final ResourceAccessObserver accessObserver = new ResourceAccessObserver();
 
 
   @BeforeAll
@@ -53,10 +54,12 @@ public class VSUMExampleTest {
     if (runsForTest <= VitruvChangeTimingExtension.WARM_UP_RUNS) {
       vitruvChangeObserver.rejectMeasurement();
       cprObserver.rejectMeasurement();
+      accessObserver.rejectMeasurement();
     }
     else {
       vitruvChangeObserver.acceptMeasurement();
       cprObserver.acceptMeasurement();
+      accessObserver.acceptMeasurement();
     }
   }
 
@@ -64,6 +67,7 @@ public class VSUMExampleTest {
   static void tearDown() throws IOException {
     cprObserver.printResultsTo("results_cprs.csv");
     vitruvChangeObserver.printResultsTo("results_vitruviuschange.csv");
+    accessObserver.printResultsTo("results_accessoperations.csv");
   }
 
   @RepeatedTest(VitruvChangeTimingExtension.MEASUREMENT_RUNS)
@@ -234,6 +238,8 @@ public class VSUMExampleTest {
     model.setChangePropagationMode(ChangePropagationMode.TRANSITIVE_CYCLIC);
     model.registerObserver(cprObserver);
     model.addChangePropagationListener(vitruvChangeObserver);
+    model.registerModelPersistanceObserver(accessObserver);
+
     return model;
   }
 
