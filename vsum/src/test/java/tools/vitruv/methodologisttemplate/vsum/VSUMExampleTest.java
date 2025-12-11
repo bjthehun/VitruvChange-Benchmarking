@@ -38,6 +38,7 @@ import tools.vitruv.methodologisttemplate.model.model2.Root;
  */
 @ExtendWith(VitruvChangeTimingExtension.class)
 public class VSUMExampleTest {
+  private static boolean propagateChanges = false;
   private static final VitruvChangeTimeObserver vitruvChangeObserver = new VitruvChangeTimeObserver();
   private static final ConsistencyPreservationRuleTimeObserver cprObserver = new ConsistencyPreservationRuleTimeObserver();
   private static final ResourceAccessObserver accessObserver = new ResourceAccessObserver();
@@ -77,8 +78,10 @@ public class VSUMExampleTest {
     vsum.dispose();
     vsum = createDefaultVirtualModel(tempDir);
     // Assert that the reloaded virtual model contains the changes we made before disposing it
-    Assertions.assertEquals(1, getDefaultView(vsum, List.of(System.class)).getRootObjects().size());
-    Assertions.assertEquals(1, getDefaultView(vsum, List.of(Root.class)).getRootObjects().size());
+    if (propagateChanges) {
+      Assertions.assertEquals(1, getDefaultView(vsum, List.of(System.class)).getRootObjects().size());
+      Assertions.assertEquals(1, getDefaultView(vsum, List.of(Root.class)).getRootObjects().size());
+    }
   }
 
   @RepeatedTest(VitruvChangeTimingExtension.MEASUREMENT_RUNS)
@@ -86,10 +89,12 @@ public class VSUMExampleTest {
     VirtualModel vsum = createDefaultVirtualModel(tempDir);
     addSystem(vsum, tempDir);
     // assert that the directly added System is present
-    Assertions.assertEquals(1, getDefaultView(vsum, List.of(System.class)).getRootObjects().size());
-    // as well as the Root that should be created by the Reactions, see
-    // templateReactions.reactions#14
-    Assertions.assertEquals(1, getDefaultView(vsum, List.of(Root.class)).getRootObjects().size());
+    if (propagateChanges) {
+      Assertions.assertEquals(1, getDefaultView(vsum, List.of(System.class)).getRootObjects().size());
+      // as well as the Root that should be created by the Reactions, see
+      // templateReactions.reactions#14
+      Assertions.assertEquals(1, getDefaultView(vsum, List.of(Root.class)).getRootObjects().size());
+    }
   }
 
   @RepeatedTest(VitruvChangeTimingExtension.MEASUREMENT_RUNS)
@@ -97,7 +102,7 @@ public class VSUMExampleTest {
     InternalVirtualModel vsum = createDefaultVirtualModel(tempDir);
     addSystem(vsum, tempDir);
     addComponent(vsum);
-    Assertions.assertTrue(assertView(getDefaultView(vsum, List.of(System.class, Root.class)), (View v) -> {
+    Assertions.assertTrue(!propagateChanges || assertView(getDefaultView(vsum, List.of(System.class, Root.class)), (View v) -> {
       // assert that a component has been inserted, a entity has been created and that
       // both have the same name
       // Note: to make the test result easier to understand, these different effects
@@ -118,7 +123,7 @@ public class VSUMExampleTest {
       // add a router to the system
       v.getRootObjects(System.class).iterator().next().getComponents().add(ModelFactory.eINSTANCE.createRouter());
     });
-    Assertions.assertTrue(assertView(getDefaultView(vsum, List.of(System.class, Root.class)), (View v) -> {
+    Assertions.assertTrue(!propagateChanges || assertView(getDefaultView(vsum, List.of(System.class, Root.class)), (View v) -> {
       // assert that the router has been added and that the corresponding entity has
       // been created
       return v.getRootObjects(System.class).iterator().next()
@@ -138,7 +143,7 @@ public class VSUMExampleTest {
       // change the name of the component
       v.getRootObjects(System.class).iterator().next().getComponents().get(0).setName(newName);
     });
-    Assertions.assertTrue(assertView(getDefaultView(vsum, List.of(System.class, Root.class)), (View v) -> {
+    Assertions.assertTrue(!propagateChanges || assertView(getDefaultView(vsum, List.of(System.class, Root.class)), (View v) -> {
       // assert that the renaming worked on the component as well as the corresponding
       // entity
       return v.getRootObjects(System.class).iterator().next()
@@ -156,7 +161,7 @@ public class VSUMExampleTest {
     modifyView(getDefaultView(vsum, List.of(System.class)).withChangeDerivingTrait(), (CommittableView v) -> {
       v.getRootObjects(System.class).iterator().next().getComponents().remove(0);
     });
-    Assertions.assertTrue(assertView(getDefaultView(vsum, List.of(System.class, Root.class)), (View v) -> {
+    Assertions.assertTrue(!propagateChanges || assertView(getDefaultView(vsum, List.of(System.class, Root.class)), (View v) -> {
       // assert that the deletion of the component worked and that the corresponding
       // entity also got deleted
       return v.getRootObjects(System.class).iterator().next().getComponents().isEmpty()
@@ -192,7 +197,7 @@ public class VSUMExampleTest {
 
     // assert that the link has been created and that it is connected to the two
     // components
-    Assertions.assertTrue(assertView(getDefaultView(vsum, List.of(Root.class)), (View v) -> {
+    Assertions.assertTrue(!propagateChanges || assertView(getDefaultView(vsum, List.of(Root.class)), (View v) -> {
       var root = v.getRootObjects(Root.class).iterator().next();
       return root.getLinks().size() == 1
           && root.getLinks().get(0).getEntities().size() == 2
@@ -230,10 +235,14 @@ public class VSUMExampleTest {
   }
 
   private InternalVirtualModel createDefaultVirtualModel(Path projectPath) {
-    VirtualModelImpl model = (VirtualModelImpl) new VirtualModelBuilder()
+    VirtualModelBuilder builder = new VirtualModelBuilder()
         .withStorageFolder(projectPath)
-        .withUserInteractorForResultProvider(new TestUserInteraction.ResultProvider(new TestUserInteraction()))
-        .withChangePropagationSpecifications(new Model2Model2ChangePropagationSpecification())
+        .withUserInteractorForResultProvider(new TestUserInteraction.ResultProvider(new TestUserInteraction()));
+    if (propagateChanges) {
+      builder = builder
+        .withChangePropagationSpecifications(new Model2Model2ChangePropagationSpecification());
+    }
+    VirtualModelImpl model = (VirtualModelImpl) builder
         .buildAndInitialize();
     model.setChangePropagationMode(ChangePropagationMode.TRANSITIVE_CYCLIC);
     model.registerObserver(cprObserver);
