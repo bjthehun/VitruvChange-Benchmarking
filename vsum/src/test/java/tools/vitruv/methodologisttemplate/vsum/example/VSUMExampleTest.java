@@ -1,4 +1,4 @@
-package tools.vitruv.methodologisttemplate.vsum;
+package tools.vitruv.methodologisttemplate.vsum.example;
 
 import java.io.IOException;
 import java.nio.file.Path;
