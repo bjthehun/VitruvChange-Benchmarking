@@ -24,4 +24,15 @@ Workflow {
         generateCustomClasses = false
     }
 
+    component = EcoreGenerator {
+        genModel = "platform:/resource/tools.vitruv.methodologisttemplate.model/src/main/ecore/simulink.genmodel"
+        srcPath = "platform:/resource/tools.vitruv.methodologisttemplate.model/target/generated-sources/ecore"
+        generateCustomClasses = false
+    }
+
+    component = EcoreGenerator {
+        genModel = "platform:/resource/tools.vitruv.methodologisttemplate.model/src/main/ecore/autosar.genmodel"
+        srcPath = "platform:/resource/tools.vitruv.methodologisttemplate.model/target/generated-sources/ecore"
+        generateCustomClasses = false
+    }
 }

@@ -48,15 +48,5 @@
   </build>
 
   <dependencies>
-    <dependency>
-      <groupId>sdq-demo-metamodels</groupId>
-      <artifactId>edu.kit.ipd.sdq.metamodels.autosar</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>sdq-demo-metamodels</groupId>
-      <artifactId>edu.kit.ipd.sdq.metamodels.simulink</artifactId>
-    </dependency>
-   
   </dependencies>
 </project>

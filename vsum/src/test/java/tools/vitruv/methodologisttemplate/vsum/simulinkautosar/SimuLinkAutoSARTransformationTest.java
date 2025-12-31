@@ -8,6 +8,7 @@ import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import lombok.Getter;
 import lombok.AccessLevel;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach; 
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,12 +26,14 @@ import static tools.vitruv.methodologisttemplate.vsum.simulinkautosar.util.SimuL
 import static tools.vitruv.methodologisttemplate.vsum.simulinkautosar.util.AutoSARQueryUtil.*;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.xmi.impl.XMIResourceFactoryImpl;
+import tools.vitruv.methodologisttemplate.vsum.observers.VitruvChangeTimeObserver;
 import tools.vitruv.methodologisttemplate.vsum.simulinkautosar.util.SimuLinkAutoSARViewFactory;
 import tools.vitruv.methodologisttemplate.vsum.simulinkautosar.util.SimuLinkAutoSARClassifierEqualityValidation;
 
 @ExtendWith(RegisterMetamodelsInStandalone.class)
 public abstract class SimuLinkAutoSARTransformationTest extends ViewBasedVitruvApplicationTest {
 	protected SimuLinkAutoSARViewFactory viewFactory;
+	protected VitruvChangeTimeObserver observer = new VitruvChangeTimeObserver();
 	
 	protected final SimuLinkAutoSARClassifierEqualityValidation validation = new SimuLinkAutoSARClassifierEqualityValidation(
 		SIMULINK_MODEL_NAME,
@@ -58,7 +61,14 @@ public abstract class SimuLinkAutoSARTransformationTest extends ViewBasedVitruvA
 
 	@BeforeEach
 	final void setupViewFactory() {
-		viewFactory = new SimuLinkAutoSARViewFactory(getVirtualModel());
+		var vsum = getVirtualModel();
+		vsum.addChangePropagationListener(observer);
+		viewFactory = new SimuLinkAutoSARViewFactory(vsum);
+	}
+
+	@AfterEach
+	final void deregisterObservers() {
+		getVirtualModel().removeChangePropagationListener(observer);
 	}
 
 	@Override

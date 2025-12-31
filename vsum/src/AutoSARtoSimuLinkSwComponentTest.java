@@ -1,11 +1,13 @@
 package tools.vitruv.methodologisttemplate.vsum.simulinkautosar.autosar2simulink;
 
+import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 
 import static tools.vitruv.methodologisttemplate.vsum.simulinkautosar.util.AutoSARQueryUtil.*;
 import edu.kit.ipd.sdq.metamodels.autosar.AtomicSwComponent;
 import edu.kit.ipd.sdq.metamodels.autosar.CompositeSwComponent;
+import tools.vitruv.methodologisttemplate.vsum.observers.VitruvChangeTimingExtension;
 
 class AutoSARtoSimuLinkSwComponentTest extends AbstractAutoSARToSimuLinkTest {
 	
@@ -15,14 +17,14 @@ class AutoSARtoSimuLinkSwComponentTest extends AbstractAutoSARToSimuLinkTest {
 	/*
 	 * Tests for AtomicSwComponents
 	 */
-	
-	@Test
+
+	@RepeatedTest(VitruvChangeTimingExtension.MEASUREMENT_RUNS)
 	void testCreateComponent() {
 		createAtomicSWComponentInModel(DEFAULT_COMPONENT_NAME);
 		validation.assertSwComponentWithNameInRootModel(DEFAULT_COMPONENT_NAME);
 	}
 
-	@Test
+	@RepeatedTest(VitruvChangeTimingExtension.MEASUREMENT_RUNS)
 	void testDeleteComponent(){
 		createAtomicSWComponentInModel(DEFAULT_COMPONENT_NAME);
 		viewFactory.changeAutoSARView(view ->
@@ -34,8 +36,8 @@ class AutoSARtoSimuLinkSwComponentTest extends AbstractAutoSARToSimuLinkTest {
 	/*
 	 * Tests for CompositeSwComponents
 	 */
-	
-	@Test
+
+	@RepeatedTest(VitruvChangeTimingExtension.MEASUREMENT_RUNS)
 	void testCreateCompositeComponent() {
 		createCompositeSWComponentInModel(DEFAULT_COMPOSITE_COMPONENT_NAME);
 		createAtomicSWComponentInModel(DEFAULT_COMPONENT_NAME);
@@ -48,8 +50,8 @@ class AutoSARtoSimuLinkSwComponentTest extends AbstractAutoSARToSimuLinkTest {
 		
 		validation.assertCompositeSwComponentWithNameInRootModel(DEFAULT_COMPOSITE_COMPONENT_NAME);
 	}
-	
-	@Test
+
+	@RepeatedTest(VitruvChangeTimingExtension.MEASUREMENT_RUNS)
 	void testDeleteCompositeComponent(){
 		createCompositeSWComponentInModel(DEFAULT_COMPOSITE_COMPONENT_NAME);
 		viewFactory.changeAutoSARView(view ->
@@ -57,9 +59,8 @@ class AutoSARtoSimuLinkSwComponentTest extends AbstractAutoSARToSimuLinkTest {
 		);
 		validation.assertNoElementWithNameInRootModel(DEFAULT_COMPOSITE_COMPONENT_NAME);
 	}
-	
-	
-	@Test
+
+	@RepeatedTest(VitruvChangeTimingExtension.MEASUREMENT_RUNS)
 	void testDeleteCompositeComponentAndCheckContainedAtomicComponent() {
 		createCompositeSWComponentInModel(DEFAULT_COMPOSITE_COMPONENT_NAME);
 		createAtomicSWComponentInModel(DEFAULT_COMPONENT_NAME);

@@ -1,12 +1,13 @@
 package tools.vitruv.methodologisttemplate.vsum.simulinkautosar.simulink2autosar;
 
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.RepeatedTest;
 import static tools.vitruv.methodologisttemplate.vsum.simulinkautosar.util.SimuLinkQueryUtil.*;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import edu.kit.ipd.sdq.metamodels.simulink.SubSystem;
 import edu.kit.ipd.sdq.metamodels.simulink.SimuLinkFactory;
 import edu.kit.ipd.sdq.metamodels.simulink.OutPortBlock;
 import edu.kit.ipd.sdq.metamodels.simulink.SingleConnection;
+import tools.vitruv.methodologisttemplate.vsum.observers.VitruvChangeTimingExtension;
 
 class SimuLinkToAutoSARPortTest extends AbstractSimuLinkToAutoSARTest {
 	
@@ -23,7 +24,7 @@ class SimuLinkToAutoSARPortTest extends AbstractSimuLinkToAutoSARTest {
 	/*
 	 * Tests for Ports
 	 */
-	@Test
+	@RepeatedTest(VitruvChangeTimingExtension.MEASUREMENT_RUNS)
 	void testCreateInPortinBlock() {
 		createBlockInModel(DEFAULT_BLOCK_NAME);
 		viewFactory.changeSimuLinkView((view) -> {
@@ -35,7 +36,7 @@ class SimuLinkToAutoSARPortTest extends AbstractSimuLinkToAutoSARTest {
 		validation.assertPortsInBlockOrComponent(DEFAULT_BLOCK_NAME);
 	}
 
-	@Test
+	@RepeatedTest(VitruvChangeTimingExtension.MEASUREMENT_RUNS)
 	void testCreateOutPortinBlock() {
 		createBlockInModel(DEFAULT_BLOCK_NAME);
 		viewFactory.changeSimuLinkView((view) -> {
@@ -48,7 +49,7 @@ class SimuLinkToAutoSARPortTest extends AbstractSimuLinkToAutoSARTest {
 	}
 	
 	
-	@Test
+	@RepeatedTest(VitruvChangeTimingExtension.MEASUREMENT_RUNS)
 	void testCreateInPortinSubSystem() {
 		createSubsystemInModel(DEFAULT_SUBSYSTEM_NAME);
 		viewFactory.changeSimuLinkView((view) -> {
@@ -60,7 +61,7 @@ class SimuLinkToAutoSARPortTest extends AbstractSimuLinkToAutoSARTest {
 		validation.assertPortsInBlockOrComponent(DEFAULT_SUBSYSTEM_NAME);
 	}
 	
-	@Test
+	@RepeatedTest(VitruvChangeTimingExtension.MEASUREMENT_RUNS)
 	void testCreateOutPortinSubSystem() {
 		createSubsystemInModel(DEFAULT_SUBSYSTEM_NAME);
 		viewFactory.changeSimuLinkView((view) -> {
@@ -72,7 +73,7 @@ class SimuLinkToAutoSARPortTest extends AbstractSimuLinkToAutoSARTest {
 		validation.assertPortsInBlockOrComponent(DEFAULT_SUBSYSTEM_NAME);
 	}
 	
-	@Test
+	@RepeatedTest(VitruvChangeTimingExtension.MEASUREMENT_RUNS)
 	void testDeleteInPortinBlock() {
 		testCreateInPortinBlock();
 		viewFactory.changeSimuLinkView((view) -> {
@@ -82,7 +83,7 @@ class SimuLinkToAutoSARPortTest extends AbstractSimuLinkToAutoSARTest {
 		validation.assertNoPortWithNameInComponent(DEFAULT_BLOCK_NAME, DEFAULT_INPORT_NAME);
 	}
 	
-	@Test
+	@RepeatedTest(VitruvChangeTimingExtension.MEASUREMENT_RUNS)
 	void testDeleteOutPortinSwComponent() {
 		testCreateOutPortinBlock();
 		viewFactory.changeSimuLinkView((view) -> {
@@ -95,7 +96,7 @@ class SimuLinkToAutoSARPortTest extends AbstractSimuLinkToAutoSARTest {
 	/**
 	 * Test of Connections
 	 */
-	@Test
+	@RepeatedTest(VitruvChangeTimingExtension.MEASUREMENT_RUNS)
 	void testCreateSingleConnectionFromBlockToOutPortBlock(){
 		createSubsystemInModel(DEFAULT_SUBSYSTEM_NAME);
 	 	createBlockInModel(DEFAULT_BLOCK_NAME);
@@ -134,7 +135,7 @@ class SimuLinkToAutoSARPortTest extends AbstractSimuLinkToAutoSARTest {
 			DEFAULT_BLOCK_NAME);
 	}
 	
-	@Test
+	@RepeatedTest(VitruvChangeTimingExtension.MEASUREMENT_RUNS)
 	void testCreateSingleConnectionBetweenTwoBlocks(){
 		createSubsystemInModel(DEFAULT_SUBSYSTEM_NAME);
 		createBlockInModel(DEFAULT_BLOCK_NAME);

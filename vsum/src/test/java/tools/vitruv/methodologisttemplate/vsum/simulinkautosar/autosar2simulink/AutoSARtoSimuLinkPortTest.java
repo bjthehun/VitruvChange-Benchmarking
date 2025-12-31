@@ -1,5 +1,6 @@
 package tools.vitruv.methodologisttemplate.vsum.simulinkautosar.autosar2simulink;
 
+import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 
@@ -7,6 +8,7 @@ import static tools.vitruv.methodologisttemplate.vsum.simulinkautosar.util.AutoS
 import edu.kit.ipd.sdq.metamodels.autosar.AtomicSwComponent;
 import edu.kit.ipd.sdq.metamodels.autosar.CompositeSwComponent;
 import edu.kit.ipd.sdq.metamodels.autosar.AutoSARFactory;
+import tools.vitruv.methodologisttemplate.vsum.observers.VitruvChangeTimingExtension;
 
 class AutoSARtoSimuLinkPortTest extends AbstractAutoSARToSimuLinkTest {
 	
@@ -22,7 +24,7 @@ class AutoSARtoSimuLinkPortTest extends AbstractAutoSARToSimuLinkTest {
 	 * Tests for Ports
 	 */
 	 
-	@Test
+	@RepeatedTest(VitruvChangeTimingExtension.MEASUREMENT_RUNS)
 	void testCreateRequiredPortinSwComponent() {
 		createAtomicSWComponentInModel(DEFAULT_COMPONENT_NAME);
 		viewFactory.changeAutoSARView((view) -> {
@@ -33,10 +35,10 @@ class AutoSARtoSimuLinkPortTest extends AbstractAutoSARToSimuLinkTest {
 		});
 		validation.assertPortsInBlockOrComponent(DEFAULT_COMPONENT_NAME);
 	}
-	
-	
-	
-	@Test
+
+
+
+	@RepeatedTest(VitruvChangeTimingExtension.MEASUREMENT_RUNS)
 	void testCreateProvidedPortinSwComponent() {
 		createAtomicSWComponentInModel(DEFAULT_COMPONENT_NAME);
 		viewFactory.changeAutoSARView((view) ->{
@@ -47,8 +49,8 @@ class AutoSARtoSimuLinkPortTest extends AbstractAutoSARToSimuLinkTest {
 		});
 		validation.assertPortsInBlockOrComponent(DEFAULT_COMPONENT_NAME);
 	}
-	
-	@Test
+
+	@RepeatedTest(VitruvChangeTimingExtension.MEASUREMENT_RUNS)
 	void testCreateRequiredPortinCompositeSwComponent() {
 		createCompositeSWComponentInModel(DEFAULT_COMPOSITE_COMPONENT_NAME);
 		viewFactory.changeAutoSARView((view) ->{
@@ -60,7 +62,7 @@ class AutoSARtoSimuLinkPortTest extends AbstractAutoSARToSimuLinkTest {
 		validation.assertPortsInBlockOrComponent(DEFAULT_COMPOSITE_COMPONENT_NAME);
 	}
 
-	@Test
+	@RepeatedTest(VitruvChangeTimingExtension.MEASUREMENT_RUNS)
 	void testCreateProvidedPortinCompositeSwComponent() {
 		createCompositeSWComponentInModel(DEFAULT_COMPOSITE_COMPONENT_NAME);
 		viewFactory.changeAutoSARView((view) ->{
@@ -71,8 +73,8 @@ class AutoSARtoSimuLinkPortTest extends AbstractAutoSARToSimuLinkTest {
 		});
 		validation.assertPortsInBlockOrComponent(DEFAULT_COMPOSITE_COMPONENT_NAME);
 	}
-	
-	@Test
+
+	@RepeatedTest(VitruvChangeTimingExtension.MEASUREMENT_RUNS)
 	void testDeleteRequiredPortinSwComponent() {
 		testCreateRequiredPortinSwComponent();
 				
@@ -82,8 +84,8 @@ class AutoSARtoSimuLinkPortTest extends AbstractAutoSARToSimuLinkTest {
 		});
 		validation.assertNoPortWithNameInComponent(DEFAULT_COMPONENT_NAME, DEFAULT_REQUIRED_PORT_NAME);
 	}
-	
-	@Test
+
+	@RepeatedTest(VitruvChangeTimingExtension.MEASUREMENT_RUNS)
 	void testDeleteProvidedPortinSwComponent() {
 		testCreateProvidedPortinSwComponent();
 
@@ -97,7 +99,7 @@ class AutoSARtoSimuLinkPortTest extends AbstractAutoSARToSimuLinkTest {
 	/*
 	 * Test of SwConnectors
 	 */
-	@Test
+	@RepeatedTest(VitruvChangeTimingExtension.MEASUREMENT_RUNS)
 	void testCreateDelegationSwConnector(){
 		createCompositeSWComponentInModel(DEFAULT_COMPOSITE_COMPONENT_NAME);
 		createAtomicSWComponentInModel(DEFAULT_COMPONENT_NAME);
