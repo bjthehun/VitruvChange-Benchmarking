@@ -1,5 +1,7 @@
 package tools.vitruv.methodologisttemplate.vsum.simulinkautosar;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.function.Consumer;
 import java.util.List;
@@ -8,9 +10,7 @@ import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import lombok.Getter;
 import lombok.AccessLevel;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach; 
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import edu.kit.ipd.sdq.metamodels.autosar.AutoSARModel;
@@ -26,15 +26,17 @@ import static tools.vitruv.methodologisttemplate.vsum.simulinkautosar.util.SimuL
 import static tools.vitruv.methodologisttemplate.vsum.simulinkautosar.util.AutoSARQueryUtil.*;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.xmi.impl.XMIResourceFactoryImpl;
+import tools.vitruv.framework.vsum.internal.VirtualModelImpl;
+import tools.vitruv.methodologisttemplate.vsum.observers.ConsistencyPreservationRuleTimeObserver;
+import tools.vitruv.methodologisttemplate.vsum.observers.ResourceAccessObserver;
 import tools.vitruv.methodologisttemplate.vsum.observers.VitruvChangeTimeObserver;
+import tools.vitruv.methodologisttemplate.vsum.observers.VitruvChangeTimingExtension;
 import tools.vitruv.methodologisttemplate.vsum.simulinkautosar.util.SimuLinkAutoSARViewFactory;
 import tools.vitruv.methodologisttemplate.vsum.simulinkautosar.util.SimuLinkAutoSARClassifierEqualityValidation;
 
 @ExtendWith(RegisterMetamodelsInStandalone.class)
 public abstract class SimuLinkAutoSARTransformationTest extends ViewBasedVitruvApplicationTest {
 	protected SimuLinkAutoSARViewFactory viewFactory;
-	protected VitruvChangeTimeObserver observer = new VitruvChangeTimeObserver();
-	
 	protected final SimuLinkAutoSARClassifierEqualityValidation validation = new SimuLinkAutoSARClassifierEqualityValidation(
 		SIMULINK_MODEL_NAME,
 			((Consumer<Consumer<View>>) (Consumer<View> viewApplication) -> {
@@ -59,17 +61,60 @@ public abstract class SimuLinkAutoSARTransformationTest extends ViewBasedVitruvA
 	}
 	
 
-	@BeforeEach
-	final void setupViewFactory() {
-		var vsum = getVirtualModel();
-		vsum.addChangePropagationListener(observer);
-		viewFactory = new SimuLinkAutoSARViewFactory(vsum);
-	}
+	protected static VitruvChangeTimeObserver observer = new VitruvChangeTimeObserver();
+	protected static ResourceAccessObserver accessObserver = new ResourceAccessObserver();
+	protected static ConsistencyPreservationRuleTimeObserver cprObserver =new ConsistencyPreservationRuleTimeObserver();
+	protected static boolean enableCPRs = false;
+
+	@AfterEach
+  	void decideAboutAcceptingMeasurement(RepetitionInfo repetitionInfo) {
+		var runsForTest = repetitionInfo.getCurrentRepetition();
+		if (runsForTest <= VitruvChangeTimingExtension.WARM_UP_RUNS) {
+			observer.rejectMeasurement();
+			cprObserver.rejectMeasurement();
+			accessObserver.rejectMeasurement();
+		}
+		else {
+			observer.acceptMeasurement();
+			cprObserver.acceptMeasurement();
+			accessObserver.acceptMeasurement();
+		}
+ 	}
 
 	@AfterEach
 	final void deregisterObservers() {
-		getVirtualModel().removeChangePropagationListener(observer);
+		var vsum = (VirtualModelImpl) getVirtualModel();
+		
+		vsum.removeChangePropagationListener(observer);
+		vsum.deregisterObserver(cprObserver);
+		vsum.deregisterModelPersistanceObserver(accessObserver);
 	}
+
+	@AfterAll
+	static void writeResultsToFile(TestInfo testInfo) throws IOException {
+		var resultPath = Path.of("results");
+		if (!Files.exists(resultPath)) {
+			Files.createDirectory(resultPath);
+		}
+		
+		var testName = testInfo.getDisplayName();
+		if (!enableCPRs) {
+			testName += "_no_cprs";
+		}
+		observer.printResultsTo("results/vitruviuschange_"+testName+".csv");
+		cprObserver.printResultsTo("results/cprs_"+testName+".csv");
+		accessObserver.printResultsTo("results/accessoperations_"+testName+".csv");
+	}
+
+	@BeforeEach
+	final void setupViewFactory() {
+		var vsum = (VirtualModelImpl) getVirtualModel();
+		vsum.addChangePropagationListener(observer);
+		vsum.registerModelPersistanceObserver(accessObserver);
+		vsum.registerObserver(cprObserver);
+		viewFactory = new SimuLinkAutoSARViewFactory(vsum);
+	}
+	
 
 	@Override
 	protected boolean enableTransitiveCyclicChangePropagation() {
