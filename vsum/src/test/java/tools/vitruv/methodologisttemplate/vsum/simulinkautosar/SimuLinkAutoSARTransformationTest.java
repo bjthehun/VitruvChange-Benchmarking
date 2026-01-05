@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.function.Consumer;
+import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.emf.common.util.URI;
@@ -75,11 +76,14 @@ public abstract class SimuLinkAutoSARTransformationTest extends ViewBasedVitruvA
 			accessObserver.rejectMeasurement();
 		}
 		else {
+			System.out.println("Accepting Measurement");
 			observer.acceptMeasurement();
 			cprObserver.acceptMeasurement();
 			accessObserver.acceptMeasurement();
 		}
  	}
+
+
 
 	@AfterEach
 	final void deregisterObservers() {
@@ -135,7 +139,10 @@ public abstract class SimuLinkAutoSARTransformationTest extends ViewBasedVitruvA
 
 	@Override
 	protected Iterable<ChangePropagationSpecification> getChangePropagationSpecifications() {
-		return List.of(new AutoSARToSimulinkChangePropagationSpecification(), new SimuLinkTOAutoSARChangePropagationSpecification());
+		if (enableCPRs) {
+			return List.of(new AutoSARToSimulinkChangePropagationSpecification(), new SimuLinkTOAutoSARChangePropagationSpecification());
+		}
+		return Collections.emptyList();
 	}
 
 	protected void createAndRegisterRoot(View view, EObject rootObject, URI persistenceUri) {
