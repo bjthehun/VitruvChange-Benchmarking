@@ -1,6 +1,7 @@
 package tools.vitruv.methodologisttemplate.vsum.example;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
@@ -16,6 +17,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.RepetitionInfo;
+import org.junit.jupiter.api.TestInfo;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -43,7 +45,7 @@ import tools.vitruv.methodologisttemplate.vsum.observers.VitruvChangeTimingExten
  */
 @ExtendWith(VitruvChangeTimingExtension.class)
 public class VSUMExampleTest {
-  private static boolean propagateChanges = false;
+  private static boolean propagateChanges = true;
   private static VitruvChangeTimeObserver vitruvChangeObserver = new VitruvChangeTimeObserver();
   private static ConsistencyPreservationRuleTimeObserver cprObserver = new ConsistencyPreservationRuleTimeObserver();
   private static ResourceAccessObserver accessObserver = new ResourceAccessObserver();
@@ -72,12 +74,22 @@ public class VSUMExampleTest {
     }
   }
 
-  @AfterAll
-  static void tearDown() throws IOException {
-    cprObserver.printResultsTo("results_cprs.csv");
-    vitruvChangeObserver.printResultsTo("results_vitruviuschange.csv");
-    accessObserver.printResultsTo("results_accessoperations.csv");
-  }
+	@AfterAll
+	static void writeResultsToFile(TestInfo testInfo) throws IOException {
+		var resultPath = Path.of("results");
+		if (!Files.exists(resultPath)) {
+			Files.createDirectory(resultPath);
+		}
+		
+		var testName = testInfo.getDisplayName();
+		if (!propagateChanges) {
+			testName += "_no_cprs";
+		}
+		vitruvChangeObserver.printResultsTo("results/vitruviuschange_"+testName+".csv");
+		cprObserver.printResultsTo("results/cprs_"+testName+".csv");
+		accessObserver.printResultsTo("results/accessoperations_"+testName+".csv");
+	}
+
 
   @RepeatedTest(VitruvChangeTimingExtension.MEASUREMENT_RUNS)
   void reloadFilledVirtualModel(@TempDir Path tempDir) {
