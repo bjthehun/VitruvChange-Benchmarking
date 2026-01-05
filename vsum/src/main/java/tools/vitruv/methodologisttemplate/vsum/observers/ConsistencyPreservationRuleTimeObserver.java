@@ -28,8 +28,8 @@ public class ConsistencyPreservationRuleTimeObserver extends TimeObserver<Pair<L
   @Override
   public void changePropagationStopped(ChangePropagationSpecification cps, EChange<EObject> triggeringChange) {
     var timeForCPS = stopTiming();
-    timesPerChangeType.add(new Pair<Long,Long>(cpsApplicationCounter, timeForCPS));
     cpsApplicationCounter++;
+    timesPerChangeType.add(new Pair<Long,Long>(cpsApplicationCounter, timeForCPS));
   }
 
   @Override

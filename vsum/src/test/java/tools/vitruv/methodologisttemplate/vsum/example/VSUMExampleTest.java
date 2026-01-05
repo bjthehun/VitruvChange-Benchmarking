@@ -22,6 +22,7 @@ import org.junit.jupiter.api.io.TempDir;
 import mir.reactions.model2Model2.Model2Model2ChangePropagationSpecification;
 import tools.vitruv.change.propagation.ChangePropagationMode;
 import tools.vitruv.change.testutils.TestUserInteraction;
+import tools.vitruv.change.utils.ResourceAccess;
 import tools.vitruv.framework.views.CommittableView;
 import tools.vitruv.framework.views.View;
 import tools.vitruv.framework.views.ViewTypeFactory;
@@ -43,13 +44,16 @@ import tools.vitruv.methodologisttemplate.vsum.observers.VitruvChangeTimingExten
 @ExtendWith(VitruvChangeTimingExtension.class)
 public class VSUMExampleTest {
   private static boolean propagateChanges = false;
-  private static final VitruvChangeTimeObserver vitruvChangeObserver = new VitruvChangeTimeObserver();
-  private static final ConsistencyPreservationRuleTimeObserver cprObserver = new ConsistencyPreservationRuleTimeObserver();
-  private static final ResourceAccessObserver accessObserver = new ResourceAccessObserver();
+  private static VitruvChangeTimeObserver vitruvChangeObserver = new VitruvChangeTimeObserver();
+  private static ConsistencyPreservationRuleTimeObserver cprObserver = new ConsistencyPreservationRuleTimeObserver();
+  private static ResourceAccessObserver accessObserver = new ResourceAccessObserver();
 
 
   @BeforeAll
   static void setup() {
+    vitruvChangeObserver = new VitruvChangeTimeObserver();
+    cprObserver = new ConsistencyPreservationRuleTimeObserver();
+    accessObserver = new ResourceAccessObserver();
     Resource.Factory.Registry.INSTANCE.getExtensionToFactoryMap().put("*", new XMIResourceFactoryImpl());
   }
 
