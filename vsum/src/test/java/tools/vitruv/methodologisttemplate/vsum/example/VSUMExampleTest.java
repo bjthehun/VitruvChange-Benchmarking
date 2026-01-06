@@ -39,6 +39,7 @@ import tools.vitruv.methodologisttemplate.vsum.observers.ConsistencyPreservation
 import tools.vitruv.methodologisttemplate.vsum.observers.ResourceAccessObserver;
 import tools.vitruv.methodologisttemplate.vsum.observers.VitruvChangeTimeObserver;
 import tools.vitruv.methodologisttemplate.vsum.observers.VitruvChangeTimingExtension;
+import tools.vitruv.methodologisttemplate.vsum.observers.VSUMStatisticsObserver;
 
 /**
  * This class provides an example how to define and use a VSUM.
@@ -269,6 +270,10 @@ public class VSUMExampleTest {
     model.addChangePropagationListener(vitruvChangeObserver);
     model.registerModelPersistanceObserver(accessObserver);
 
+    try {
+      new VSUMStatisticsObserver(model).writeVSUMStatistics("results/sizes_VSUMExampleTest.csv");
+    }
+    catch (IOException e) {}
     return model;
   }
 
