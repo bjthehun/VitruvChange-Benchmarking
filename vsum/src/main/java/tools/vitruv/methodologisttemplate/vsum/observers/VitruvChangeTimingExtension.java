@@ -15,19 +15,25 @@ public class VitruvChangeTimingExtension implements
   /**
    * Observer for applying entire VitruvChanges (transactions).
    */
-  private final VitruvChangeTimeObserver vitruvChangeObserver = new VitruvChangeTimeObserver();
+  private final VitruvChangeTimeObserver vitruvChangeObserver;
   /**
    * Observer for applying consistency preservation rule changes.
    */
-  private final ConsistencyPreservationRuleTimeObserver cprObserver = new ConsistencyPreservationRuleTimeObserver();
+  private final ConsistencyPreservationRuleTimeObserver cprObserver;
   /**
    * Observers for I/O operations (loading, saving, deleting resources).
    */
-  private final ResourceAccessObserver accessObserver = new ResourceAccessObserver();
+  private final ResourceAccessObserver accessObserver;
   /**
    * Name of the class extended with this extension.
    */
   private String extendedClassName;
+
+  public VitruvChangeTimingExtension(String changeFilePath, String cprFilePath, String accessFilePath) {
+    vitruvChangeObserver = new VitruvChangeTimeObserver(changeFilePath);
+    cprObserver = new ConsistencyPreservationRuleTimeObserver(cprFilePath);
+    accessObserver = new ResourceAccessObserver(accessFilePath);
+  }
   
   public static final int WARM_UP_RUNS = 15;
   public static final int MEASUREMENT_RUNS = 15 + WARM_UP_RUNS;
@@ -47,9 +53,9 @@ public class VitruvChangeTimingExtension implements
    */
   @Override
   public void afterAll(ExtensionContext context) throws Exception {
-    cprObserver.printResultsTo("results_" + extendedClassName + " _cprs.csv");
-    vitruvChangeObserver.printResultsTo("results_" + extendedClassName + "_vitruviuschange.csv");
-    accessObserver.printResultsTo("results_" + extendedClassName + "_resourceaccess.csv");
+    cprObserver.printResultsTo();
+    vitruvChangeObserver.printResultsTo();
+    accessObserver.printResultsTo();
   }
 
 

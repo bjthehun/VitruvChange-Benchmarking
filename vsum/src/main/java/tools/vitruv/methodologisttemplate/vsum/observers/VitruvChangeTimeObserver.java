@@ -20,8 +20,8 @@ public class VitruvChangeTimeObserver extends TimeObserver<Quintuple<Long, Long,
   private long vitruviusChangeCounter = 0;
   private long eChangeCounter = 0;
 
-  public VitruvChangeTimeObserver() {
-    super(new String[]{"VitruviusChangeCounter", "NoOfEChanges", "Time", "NoOfAffectedModels", "NoOfAffectedElements"});
+  public VitruvChangeTimeObserver(String filePath) {
+    super(new String[]{"VitruviusChangeCounter", "NoOfEChanges", "Time", "NoOfAffectedModels", "NoOfAffectedElements"}, filePath);
   }
 
   @Override

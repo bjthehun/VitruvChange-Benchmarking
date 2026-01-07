@@ -22,4 +22,20 @@
             genModel="src/main/ecore/model2.genmodel"/>
    </extension>
 
+   <extension point="org.eclipse.emf.ecore.generated_package">
+      <!-- @generated simulink -->
+      <package
+            uri="edu.kit.ipd.sdq.metamodels.simulink"
+            class="edu.kit.ipd.sdq.metamodels.simulink.SimuLinkPackage"
+            genModel="src/main/ecore/simulink.genmodel"/>
+   </extension>
+
+   <extension point="org.eclipse.emf.ecore.generated_package">
+      <!-- @generated autosar -->
+      <package
+            uri="edu.kit.ipd.sdq.metamodels.autosar"
+            class="edu.kit.ipd.sdq.metamodels.autosar.AutoSARPackage"
+            genModel="src/main/ecore/autosar.genmodel"/>
+   </extension>
+
 </plugin>

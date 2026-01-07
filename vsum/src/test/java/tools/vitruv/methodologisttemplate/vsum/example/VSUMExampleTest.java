@@ -44,19 +44,27 @@ import tools.vitruv.methodologisttemplate.vsum.observers.VSUMStatisticsObserver;
 /**
  * This class provides an example how to define and use a VSUM.
  */
-@ExtendWith(VitruvChangeTimingExtension.class)
 public class VSUMExampleTest {
   private static boolean propagateChanges = true;
-  private static VitruvChangeTimeObserver vitruvChangeObserver = new VitruvChangeTimeObserver();
-  private static ConsistencyPreservationRuleTimeObserver cprObserver = new ConsistencyPreservationRuleTimeObserver();
-  private static ResourceAccessObserver accessObserver = new ResourceAccessObserver();
+  private static VitruvChangeTimeObserver vitruvChangeObserver;
+  private static ConsistencyPreservationRuleTimeObserver cprObserver;
+  private static ResourceAccessObserver accessObserver;
 
 
   @BeforeAll
-  static void setup() {
-    vitruvChangeObserver = new VitruvChangeTimeObserver();
-    cprObserver = new ConsistencyPreservationRuleTimeObserver();
-    accessObserver = new ResourceAccessObserver();
+  static void setup(TestInfo testInfo) throws IOException {
+    var resultPath = Path.of("results");
+		if (!Files.exists(resultPath)) {
+			Files.createDirectory(resultPath);
+		}
+		
+		var testName = testInfo.getDisplayName();
+		if (!propagateChanges) {
+			testName += "_no_cprs";
+		}
+    vitruvChangeObserver = new VitruvChangeTimeObserver("results/vitruviuschange_"+testName+".csv");
+    cprObserver = new ConsistencyPreservationRuleTimeObserver("results/cprs_"+testName+".csv");
+    accessObserver = new ResourceAccessObserver("results/accessoperations_"+testName+".csv");
     Resource.Factory.Registry.INSTANCE.getExtensionToFactoryMap().put("*", new XMIResourceFactoryImpl());
   }
 
@@ -77,18 +85,9 @@ public class VSUMExampleTest {
 
 	@AfterAll
 	static void writeResultsToFile(TestInfo testInfo) throws IOException {
-		var resultPath = Path.of("results");
-		if (!Files.exists(resultPath)) {
-			Files.createDirectory(resultPath);
-		}
-		
-		var testName = testInfo.getDisplayName();
-		if (!propagateChanges) {
-			testName += "_no_cprs";
-		}
-		vitruvChangeObserver.printResultsTo("results/vitruviuschange_"+testName+".csv");
-		cprObserver.printResultsTo("results/cprs_"+testName+".csv");
-		accessObserver.printResultsTo("results/accessoperations_"+testName+".csv");
+		vitruvChangeObserver.printResultsTo();
+		cprObserver.printResultsTo();
+		accessObserver.printResultsTo();
 	}
 
 

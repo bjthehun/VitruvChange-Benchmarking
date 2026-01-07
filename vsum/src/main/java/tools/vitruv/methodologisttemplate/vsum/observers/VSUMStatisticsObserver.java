@@ -11,8 +11,6 @@ import tools.vitruv.change.propagation.impl.CompositeChangePropagationSpecificat
 import tools.vitruv.dsls.reactions.runtime.reactions.AbstractReactionsChangePropagationSpecification;
 import tools.vitruv.framework.vsum.internal.VirtualModelImpl;
 
-import java.util.Collection;
-
 public class VSUMStatisticsObserver {
     private final VirtualModelImpl vsum;
 

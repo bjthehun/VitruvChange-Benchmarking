@@ -9,9 +9,11 @@ import java.util.List;
 
 public abstract class TimeObserver<T> {
   private final String [] headers;
+  private final String filePath;
 
-  protected TimeObserver (String[] headers) {
+  protected TimeObserver (String[] headers, String filePath) {
     this.headers = headers;
+    this.filePath = filePath;
   }
 
   protected List<T> timesPerChangeType = new LinkedList<>();
@@ -37,8 +39,8 @@ public abstract class TimeObserver<T> {
     timesPerChangeType.clear();
   }
 
-  public void printResultsTo(String path) throws IOException {
-    try (var writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(path)))) {
+  public void printResultsTo() throws IOException {
+    try (var writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(filePath)))) {
       writer.write(String.join(", ", headers));
       writer.newLine();
       for (var record: acceptedTimes) {
