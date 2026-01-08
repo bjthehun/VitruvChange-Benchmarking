@@ -1,7 +1,7 @@
 package tools.vitruv.methodologisttemplate.vsum.simulinkautosar.simulink2autosar;
 
 import org.junit.jupiter.api.RepeatedTest;
-import org.junit.jupiter.api.Test;
+
 import static tools.vitruv.methodologisttemplate.vsum.simulinkautosar.util.SimuLinkQueryUtil.*;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import edu.kit.ipd.sdq.metamodels.simulink.SubSystem;

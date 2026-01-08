@@ -43,7 +43,6 @@ public class VSUMStatisticsObserver {
             writer.write(noOfModels + ", " + noOfResources + ", " + noOfCPRs);
             writer.newLine();
             writer.flush();
-            writer.close();
         }
     }
 

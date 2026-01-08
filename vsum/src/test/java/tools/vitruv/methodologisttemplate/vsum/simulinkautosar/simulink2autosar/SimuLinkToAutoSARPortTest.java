@@ -8,19 +8,7 @@ import edu.kit.ipd.sdq.metamodels.simulink.SimuLinkFactory;
 import edu.kit.ipd.sdq.metamodels.simulink.OutPortBlock;
 import edu.kit.ipd.sdq.metamodels.simulink.SingleConnection;
 import tools.vitruv.methodologisttemplate.vsum.observers.VitruvChangeTimingExtension;
-
 import org.junit.jupiter.api.*;
-import tools.vitruv.framework.vsum.internal.InternalVirtualModel;
-import tools.vitruv.framework.vsum.internal.VirtualModelImpl;
-import tools.vitruv.methodologisttemplate.vsum.observers.ConsistencyPreservationRuleTimeObserver;
-import tools.vitruv.methodologisttemplate.vsum.observers.ResourceAccessObserver;
-import tools.vitruv.methodologisttemplate.vsum.observers.VitruvChangeTimeObserver;
-import tools.vitruv.methodologisttemplate.vsum.observers.VitruvChangeTimingExtension;
-import tools.vitruv.methodologisttemplate.vsum.simulinkautosar.util.SimuLinkAutoSARViewFactory;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-
 
 class SimuLinkToAutoSARPortTest extends AbstractSimuLinkToAutoSARTest {
 	

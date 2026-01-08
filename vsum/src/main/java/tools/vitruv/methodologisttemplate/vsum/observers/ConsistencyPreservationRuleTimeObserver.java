@@ -10,8 +10,8 @@ import tools.vitruv.change.propagation.ChangePropagationSpecification;
 public class ConsistencyPreservationRuleTimeObserver extends TimeObserver<Pair<Long, Long>> implements ChangePropagationObserver {
   private long cpsApplicationCounter = 0;
 
-  public ConsistencyPreservationRuleTimeObserver(String filePath) {
-    super(new String[]{"RuleCounter", "Time"}, filePath);
+  public ConsistencyPreservationRuleTimeObserver() {
+    super(new String[]{"RuleCounter", "Time"});
 
   }
 

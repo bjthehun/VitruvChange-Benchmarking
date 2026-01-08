@@ -76,8 +76,8 @@ public class ResourceAccessObserver
     }
 
 
-    public ResourceAccessObserver(String filePath) {
-        super(new String[]{ "Number", "Time", "Resource", "NoOfElements", "Type" }, filePath);
+    public ResourceAccessObserver() {
+        super(new String[]{ "Number", "Time", "Resource", "NoOfElements", "Type" });
     }
 
     @Override

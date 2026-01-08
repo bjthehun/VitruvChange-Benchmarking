@@ -11,20 +11,17 @@ import java.util.function.Function;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.xmi.impl.XMIResourceFactoryImpl;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.RepetitionInfo;
 import org.junit.jupiter.api.TestInfo;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
 
 import mir.reactions.model2Model2.Model2Model2ChangePropagationSpecification;
 import tools.vitruv.change.propagation.ChangePropagationMode;
 import tools.vitruv.change.testutils.TestUserInteraction;
-import tools.vitruv.change.utils.ResourceAccess;
 import tools.vitruv.framework.views.CommittableView;
 import tools.vitruv.framework.views.View;
 import tools.vitruv.framework.views.ViewTypeFactory;
@@ -46,30 +43,30 @@ import tools.vitruv.methodologisttemplate.vsum.observers.VSUMStatisticsObserver;
  */
 public class VSUMExampleTest {
   private static boolean propagateChanges = true;
-  private static VitruvChangeTimeObserver vitruvChangeObserver;
-  private static ConsistencyPreservationRuleTimeObserver cprObserver;
-  private static ResourceAccessObserver accessObserver;
+  private VitruvChangeTimeObserver vitruvChangeObserver = new VitruvChangeTimeObserver();
+  private ConsistencyPreservationRuleTimeObserver cprObserver = new ConsistencyPreservationRuleTimeObserver();
+  private ResourceAccessObserver accessObserver = new ResourceAccessObserver();
 
 
-  @BeforeAll
-  static void setup(TestInfo testInfo) throws IOException {
+  @BeforeEach
+  void setup(TestInfo testInfo) throws IOException {
     var resultPath = Path.of("results");
-		if (!Files.exists(resultPath)) {
-			Files.createDirectory(resultPath);
-		}
+    if (!Files.exists(resultPath)) {
+        Files.createDirectory(resultPath);
+    }
 		
-		var testName = testInfo.getDisplayName();
-		if (!propagateChanges) {
-			testName += "_no_cprs";
-		}
-    vitruvChangeObserver = new VitruvChangeTimeObserver("results/vitruviuschange_"+testName+".csv");
-    cprObserver = new ConsistencyPreservationRuleTimeObserver("results/cprs_"+testName+".csv");
-    accessObserver = new ResourceAccessObserver("results/accessoperations_"+testName+".csv");
+    var testName = testInfo.getTestClass().get().getSimpleName();
+    if (!propagateChanges) {
+        testName += "_no_cprs";
+    }
+    vitruvChangeObserver.setup("results/vitruviuschange_"+testName+".csv");
+    cprObserver.setup("results/cprs_"+testName+".csv");
+    accessObserver.setup("results/accessoperations_"+testName+".csv");
     Resource.Factory.Registry.INSTANCE.getExtensionToFactoryMap().put("*", new XMIResourceFactoryImpl());
   }
 
   @AfterEach
-  void decideAboutAcceptingMeasurement(RepetitionInfo repetitionInfo) {
+  void decideAboutAcceptingMeasurement(RepetitionInfo repetitionInfo) throws IOException {
     var runsForTest = repetitionInfo.getCurrentRepetition();
     if (runsForTest <= VitruvChangeTimingExtension.WARM_UP_RUNS) {
       vitruvChangeObserver.rejectMeasurement();
@@ -83,8 +80,8 @@ public class VSUMExampleTest {
     }
   }
 
-	@AfterAll
-	static void writeResultsToFile(TestInfo testInfo) throws IOException {
+	@AfterEach
+	void writeResultsToFile(TestInfo testInfo) throws IOException {
 		vitruvChangeObserver.printResultsTo();
 		cprObserver.printResultsTo();
 		accessObserver.printResultsTo();

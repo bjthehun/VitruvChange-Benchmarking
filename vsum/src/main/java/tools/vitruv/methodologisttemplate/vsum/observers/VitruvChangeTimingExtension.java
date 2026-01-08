@@ -30,13 +30,13 @@ public class VitruvChangeTimingExtension implements
   private String extendedClassName;
 
   public VitruvChangeTimingExtension(String changeFilePath, String cprFilePath, String accessFilePath) {
-    vitruvChangeObserver = new VitruvChangeTimeObserver(changeFilePath);
-    cprObserver = new ConsistencyPreservationRuleTimeObserver(cprFilePath);
-    accessObserver = new ResourceAccessObserver(accessFilePath);
+    vitruvChangeObserver = new VitruvChangeTimeObserver();
+    cprObserver = new ConsistencyPreservationRuleTimeObserver();
+    accessObserver = new ResourceAccessObserver();
   }
   
-  public static final int WARM_UP_RUNS = 15;
-  public static final int MEASUREMENT_RUNS = 15 + WARM_UP_RUNS;
+  public static final int WARM_UP_RUNS = 30;
+  public static final int MEASUREMENT_RUNS = 1 + WARM_UP_RUNS;
 
   private final Map<Method, Long> observedExecutions = new HashMap<>();
 

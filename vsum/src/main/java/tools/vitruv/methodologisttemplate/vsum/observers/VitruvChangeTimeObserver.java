@@ -1,15 +1,11 @@
 package tools.vitruv.methodologisttemplate.vsum.observers;
 
+import edu.kit.ipd.sdq.commons.util.java.Quintuple;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Stream;
-
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
-
-import edu.kit.ipd.sdq.commons.util.java.Quadruple;
-import edu.kit.ipd.sdq.commons.util.java.Quintuple;
-import edu.kit.ipd.sdq.commons.util.java.Triple;
 import tools.vitruv.change.atomic.EChange;
 import tools.vitruv.change.atomic.uuid.Uuid;
 import tools.vitruv.change.composite.description.PropagatedChange;
@@ -20,8 +16,8 @@ public class VitruvChangeTimeObserver extends TimeObserver<Quintuple<Long, Long,
   private long vitruviusChangeCounter = 0;
   private long eChangeCounter = 0;
 
-  public VitruvChangeTimeObserver(String filePath) {
-    super(new String[]{"VitruviusChangeCounter", "NoOfEChanges", "Time", "NoOfAffectedModels", "NoOfAffectedElements"}, filePath);
+  public VitruvChangeTimeObserver() {
+    super(new String[]{"VitruviusChangeCounter", "NoOfEChanges", "Time", "NoOfAffectedModels", "NoOfAffectedElements"});
   }
 
   @Override
