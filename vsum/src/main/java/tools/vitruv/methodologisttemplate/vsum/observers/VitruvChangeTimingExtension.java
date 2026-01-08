@@ -4,6 +4,7 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.jupiter.api.TestInfo;
 import org.junit.jupiter.api.extension.*;
 
 
@@ -28,6 +29,7 @@ public class VitruvChangeTimingExtension implements
    * Name of the class extended with this extension.
    */
   private String extendedClassName;
+  public static final boolean propagateChanges = false;
 
   public VitruvChangeTimingExtension(String changeFilePath, String cprFilePath, String accessFilePath) {
     vitruvChangeObserver = new VitruvChangeTimeObserver();
@@ -84,5 +86,13 @@ public class VitruvChangeTimingExtension implements
       vitruvChangeObserver.acceptMeasurement();
       accessObserver.acceptMeasurement();
     }
+  }
+
+  public static String getTestName(TestInfo testInfo) {
+    var testName = testInfo.getTestClass().get().getSimpleName();
+    if (!propagateChanges) {
+      testName += "_no_cprs";
+    }
+    return testName;
   }
 }

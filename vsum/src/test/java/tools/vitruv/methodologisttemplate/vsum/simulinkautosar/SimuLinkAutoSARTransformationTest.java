@@ -1,6 +1,7 @@
 package tools.vitruv.methodologisttemplate.vsum.simulinkautosar;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.function.Consumer;
 import java.util.Collections;
@@ -22,15 +23,13 @@ import tools.vitruv.change.propagation.ChangePropagationSpecification;
 import tools.vitruv.change.testutils.RegisterMetamodelsInStandalone;
 import tools.vitruv.framework.testutils.integration.ViewBasedVitruvApplicationTest;
 
+import static tools.vitruv.methodologisttemplate.vsum.observers.VitruvChangeTimingExtension.getTestName;
 import static tools.vitruv.methodologisttemplate.vsum.simulinkautosar.util.SimuLinkQueryUtil.*;
 import static tools.vitruv.methodologisttemplate.vsum.simulinkautosar.util.AutoSARQueryUtil.*;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.xmi.impl.XMIResourceFactoryImpl;
 import tools.vitruv.framework.vsum.internal.VirtualModelImpl;
-import tools.vitruv.methodologisttemplate.vsum.observers.ConsistencyPreservationRuleTimeObserver;
-import tools.vitruv.methodologisttemplate.vsum.observers.ResourceAccessObserver;
-import tools.vitruv.methodologisttemplate.vsum.observers.VitruvChangeTimeObserver;
-import tools.vitruv.methodologisttemplate.vsum.observers.VitruvChangeTimingExtension;
+import tools.vitruv.methodologisttemplate.vsum.observers.*;
 import tools.vitruv.methodologisttemplate.vsum.simulinkautosar.util.SimuLinkAutoSARViewFactory;
 import tools.vitruv.methodologisttemplate.vsum.simulinkautosar.util.SimuLinkAutoSARClassifierEqualityValidation;
 
@@ -39,10 +38,9 @@ public abstract class SimuLinkAutoSARTransformationTest extends ViewBasedVitruvA
 	protected SimuLinkAutoSARViewFactory viewFactory;
 	protected final SimuLinkAutoSARClassifierEqualityValidation validation = new SimuLinkAutoSARClassifierEqualityValidation(
 		SIMULINK_MODEL_NAME,
-			((Consumer<Consumer<View>>) (Consumer<View> viewApplication) -> {
-				Consumer<View> applied = (View view) -> viewApplication.accept(view);
-				this.viewFactory.validateAutoSARAndSimuLinkClassesView(applied);
-		})
+        (Consumer<View> viewApplication) -> {
+            this.viewFactory.validateAutoSARAndSimuLinkClassesView(viewApplication);
+}
 	);
 	
 	@Getter(AccessLevel.PROTECTED)
@@ -54,7 +52,15 @@ public abstract class SimuLinkAutoSARTransformationTest extends ViewBasedVitruvA
 	@Getter(AccessLevel.PROTECTED)
 	protected static final String MODEL_FOLDER_NAME = "model";
 	
-	
+	@BeforeAll
+	static void deleteOldResultFiles(TestInfo testInfo) throws IOException {
+		var testName = getTestName(testInfo);
+		Files.deleteIfExists(Path.of("results/vitruviuschange_"+testName+".csv"));
+		Files.deleteIfExists(Path.of("results/cprs_"+testName+".csv"));
+		Files.deleteIfExists(Path.of("results/accessoperations_"+testName+".csv"));
+		Files.deleteIfExists(Path.of("results/sizes_"+testName+".csv"));
+	}
+
 	@BeforeAll
 	static void setupSimuLinkFactories() {
 		Resource.Factory.Registry.INSTANCE.getExtensionToFactoryMap().put("*", new XMIResourceFactoryImpl());
@@ -62,10 +68,7 @@ public abstract class SimuLinkAutoSARTransformationTest extends ViewBasedVitruvA
 
 	@BeforeEach
 	void setupObservers(TestInfo testInfo) throws IOException {
-		var testName = testInfo.getTestClass().get().getSimpleName();
-		if (!propagateChanges) {
-			testName += "_no_cprs";
-		}
+		var testName = getTestName(testInfo);
 		vitruvChangeObserver.setup("results/vitruviuschange_"+testName+".csv");
 		cprObserver.setup("results/cprs_"+testName+".csv");
 		accessObserver.setup("results/accessoperations_"+testName+".csv");
@@ -74,7 +77,6 @@ public abstract class SimuLinkAutoSARTransformationTest extends ViewBasedVitruvA
 	protected VitruvChangeTimeObserver vitruvChangeObserver = new VitruvChangeTimeObserver();
 	protected ResourceAccessObserver accessObserver = new ResourceAccessObserver();
 	protected ConsistencyPreservationRuleTimeObserver cprObserver = new ConsistencyPreservationRuleTimeObserver();
-	protected static boolean propagateChanges = false;
 
 	@AfterEach
 	final void deregisterObservers() {
@@ -108,8 +110,14 @@ public abstract class SimuLinkAutoSARTransformationTest extends ViewBasedVitruvA
  	}
 
 	@BeforeEach
-	final void setupViewFactory() {
+	final void setupViewFactory(TestInfo testInfo) {
 		var vsum = (VirtualModelImpl) getVirtualModel();
+		var testName = getTestName(testInfo);
+		try {
+			new VSUMStatisticsObserver(vsum).writeVSUMStatistics("results/sizes_"+testName+".csv");
+		}
+		catch (IOException e) {}
+
 		vsum.addChangePropagationListener(vitruvChangeObserver);
 		vsum.registerModelPersistanceObserver(accessObserver);
 		vsum.registerObserver(cprObserver);
@@ -136,7 +144,7 @@ public abstract class SimuLinkAutoSARTransformationTest extends ViewBasedVitruvA
 
 	@Override
 	protected Iterable<ChangePropagationSpecification> getChangePropagationSpecifications() {
-		if (propagateChanges) {
+		if (VitruvChangeTimingExtension.propagateChanges) {
 			return List.of(
 				new AutoSARToSimulinkChangePropagationSpecification(),
 				new SimuLinkTOAutoSARChangePropagationSpecification());

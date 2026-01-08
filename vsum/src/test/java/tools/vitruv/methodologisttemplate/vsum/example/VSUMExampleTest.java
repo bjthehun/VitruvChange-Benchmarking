@@ -11,12 +11,7 @@ import java.util.function.Function;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.xmi.impl.XMIResourceFactoryImpl;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.RepeatedTest;
-import org.junit.jupiter.api.RepetitionInfo;
-import org.junit.jupiter.api.TestInfo;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.io.TempDir;
 
 import mir.reactions.model2Model2.Model2Model2ChangePropagationSpecification;
@@ -38,15 +33,24 @@ import tools.vitruv.methodologisttemplate.vsum.observers.VitruvChangeTimeObserve
 import tools.vitruv.methodologisttemplate.vsum.observers.VitruvChangeTimingExtension;
 import tools.vitruv.methodologisttemplate.vsum.observers.VSUMStatisticsObserver;
 
+import static tools.vitruv.methodologisttemplate.vsum.observers.VitruvChangeTimingExtension.getTestName;
+
 /**
  * This class provides an example how to define and use a VSUM.
  */
 public class VSUMExampleTest {
-  private static boolean propagateChanges = true;
   private VitruvChangeTimeObserver vitruvChangeObserver = new VitruvChangeTimeObserver();
   private ConsistencyPreservationRuleTimeObserver cprObserver = new ConsistencyPreservationRuleTimeObserver();
   private ResourceAccessObserver accessObserver = new ResourceAccessObserver();
 
+  @BeforeAll
+  static void deleteOldResultFiles(TestInfo testInfo) throws IOException {
+    var testName = getTestName(testInfo);
+    Files.deleteIfExists(Path.of("results/vitruviuschange_"+testName+".csv"));
+    Files.deleteIfExists(Path.of("results/cprs_"+testName+".csv"));
+    Files.deleteIfExists(Path.of("results/accessoperations_"+testName+".csv"));
+    Files.deleteIfExists(Path.of("results/sizes_"+testName+".csv"));
+  }
 
   @BeforeEach
   void setup(TestInfo testInfo) throws IOException {
@@ -56,7 +60,7 @@ public class VSUMExampleTest {
     }
 		
     var testName = testInfo.getTestClass().get().getSimpleName();
-    if (!propagateChanges) {
+    if (!VitruvChangeTimingExtension.propagateChanges) {
         testName += "_no_cprs";
     }
     vitruvChangeObserver.setup("results/vitruviuschange_"+testName+".csv");
@@ -95,7 +99,7 @@ public class VSUMExampleTest {
     vsum.dispose();
     vsum = createDefaultVirtualModel(tempDir);
     // Assert that the reloaded virtual model contains the changes we made before disposing it
-    if (propagateChanges) {
+    if (VitruvChangeTimingExtension.propagateChanges) {
       Assertions.assertEquals(1, getDefaultView(vsum, List.of(System.class)).getRootObjects().size());
       Assertions.assertEquals(1, getDefaultView(vsum, List.of(Root.class)).getRootObjects().size());
     }
@@ -106,7 +110,7 @@ public class VSUMExampleTest {
     VirtualModel vsum = createDefaultVirtualModel(tempDir);
     addSystem(vsum, tempDir);
     // assert that the directly added System is present
-    if (propagateChanges) {
+    if (VitruvChangeTimingExtension.propagateChanges) {
       Assertions.assertEquals(1, getDefaultView(vsum, List.of(System.class)).getRootObjects().size());
       // as well as the Root that should be created by the Reactions, see
       // templateReactions.reactions#14
@@ -119,7 +123,7 @@ public class VSUMExampleTest {
     InternalVirtualModel vsum = createDefaultVirtualModel(tempDir);
     addSystem(vsum, tempDir);
     addComponent(vsum);
-    Assertions.assertTrue(!propagateChanges || assertView(getDefaultView(vsum, List.of(System.class, Root.class)), (View v) -> {
+    Assertions.assertTrue(!VitruvChangeTimingExtension.propagateChanges || assertView(getDefaultView(vsum, List.of(System.class, Root.class)), (View v) -> {
       // assert that a component has been inserted, a entity has been created and that
       // both have the same name
       // Note: to make the test result easier to understand, these different effects
@@ -140,7 +144,7 @@ public class VSUMExampleTest {
       // add a router to the system
       v.getRootObjects(System.class).iterator().next().getComponents().add(ModelFactory.eINSTANCE.createRouter());
     });
-    Assertions.assertTrue(!propagateChanges || assertView(getDefaultView(vsum, List.of(System.class, Root.class)), (View v) -> {
+    Assertions.assertTrue(!VitruvChangeTimingExtension.propagateChanges || assertView(getDefaultView(vsum, List.of(System.class, Root.class)), (View v) -> {
       // assert that the router has been added and that the corresponding entity has
       // been created
       return v.getRootObjects(System.class).iterator().next()
@@ -160,7 +164,7 @@ public class VSUMExampleTest {
       // change the name of the component
       v.getRootObjects(System.class).iterator().next().getComponents().get(0).setName(newName);
     });
-    Assertions.assertTrue(!propagateChanges || assertView(getDefaultView(vsum, List.of(System.class, Root.class)), (View v) -> {
+    Assertions.assertTrue(!VitruvChangeTimingExtension.propagateChanges || assertView(getDefaultView(vsum, List.of(System.class, Root.class)), (View v) -> {
       // assert that the renaming worked on the component as well as the corresponding
       // entity
       return v.getRootObjects(System.class).iterator().next()
@@ -178,7 +182,7 @@ public class VSUMExampleTest {
     modifyView(getDefaultView(vsum, List.of(System.class)).withChangeDerivingTrait(), (CommittableView v) -> {
       v.getRootObjects(System.class).iterator().next().getComponents().remove(0);
     });
-    Assertions.assertTrue(!propagateChanges || assertView(getDefaultView(vsum, List.of(System.class, Root.class)), (View v) -> {
+    Assertions.assertTrue(!VitruvChangeTimingExtension.propagateChanges || assertView(getDefaultView(vsum, List.of(System.class, Root.class)), (View v) -> {
       // assert that the deletion of the component worked and that the corresponding
       // entity also got deleted
       return v.getRootObjects(System.class).iterator().next().getComponents().isEmpty()
@@ -214,7 +218,7 @@ public class VSUMExampleTest {
 
     // assert that the link has been created and that it is connected to the two
     // components
-    Assertions.assertTrue(!propagateChanges || assertView(getDefaultView(vsum, List.of(Root.class)), (View v) -> {
+    Assertions.assertTrue(!VitruvChangeTimingExtension.propagateChanges || assertView(getDefaultView(vsum, List.of(Root.class)), (View v) -> {
       var root = v.getRootObjects(Root.class).iterator().next();
       return root.getLinks().size() == 1
           && root.getLinks().get(0).getEntities().size() == 2
@@ -255,7 +259,7 @@ public class VSUMExampleTest {
     VirtualModelBuilder builder = new VirtualModelBuilder()
         .withStorageFolder(projectPath)
         .withUserInteractorForResultProvider(new TestUserInteraction.ResultProvider(new TestUserInteraction()));
-    if (propagateChanges) {
+    if (VitruvChangeTimingExtension.propagateChanges) {
       builder = builder
         .withChangePropagationSpecifications(new Model2Model2ChangePropagationSpecification());
     }
