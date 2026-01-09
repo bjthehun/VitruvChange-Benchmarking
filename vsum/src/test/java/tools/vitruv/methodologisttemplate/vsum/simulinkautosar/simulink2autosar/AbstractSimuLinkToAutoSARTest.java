@@ -7,6 +7,7 @@ import edu.kit.ipd.sdq.metamodels.simulink.Block;
 import edu.kit.ipd.sdq.metamodels.simulink.Connection;
 import edu.kit.ipd.sdq.metamodels.simulink.SimuLinkFactory;
 import edu.kit.ipd.sdq.metamodels.simulink.SimulinkModel;
+import edu.kit.ipd.sdq.metamodels.simulink.SingleConnection;
 import tools.vitruv.methodologisttemplate.vsum.simulinkautosar.SimuLinkAutoSARTransformationTest;
 
 abstract class AbstractSimuLinkToAutoSARTest extends SimuLinkAutoSARTransformationTest {
@@ -20,7 +21,7 @@ abstract class AbstractSimuLinkToAutoSARTest extends SimuLinkAutoSARTransformati
 
 	protected void createSimuLinkModel(Consumer<SimulinkModel> simuLinkModelInitialization) {
 		viewFactory.changeSimuLinkView((view) -> {
-			var simuLinkModel = SimuLinkFactory.eINSTANCE.createSimulinkModel();
+			SimulinkModel simuLinkModel = SimuLinkFactory.eINSTANCE.createSimulinkModel();
 			simuLinkModelInitialization.accept(simuLinkModel);
 			createAndRegisterRoot(view, simuLinkModel,
 				getUri(getProjectModelPath(SIMULINK_MODEL_NAME)));
@@ -57,7 +58,7 @@ abstract class AbstractSimuLinkToAutoSARTest extends SimuLinkAutoSARTransformati
 	
 	protected void createSingleConnectionInModel(String name){
 		changeSimuLinkModel((model) -> {
-			Connection singleConnection = SimuLinkFactory.eINSTANCE.createSingleConnection();
+			SingleConnection singleConnection = SimuLinkFactory.eINSTANCE.createSingleConnection();
 			singleConnection.setName(name);
 			model.getConnection().add(singleConnection);
 		});

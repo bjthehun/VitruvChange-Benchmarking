@@ -5,10 +5,12 @@ import static tools.vitruv.methodologisttemplate.vsum.simulinkautosar.util.SimuL
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import edu.kit.ipd.sdq.metamodels.simulink.SubSystem;
 import edu.kit.ipd.sdq.metamodels.simulink.SimuLinkFactory;
+import edu.kit.ipd.sdq.metamodels.simulink.Block;
+import edu.kit.ipd.sdq.metamodels.simulink.InPort;
+import edu.kit.ipd.sdq.metamodels.simulink.OutPort;
 import edu.kit.ipd.sdq.metamodels.simulink.OutPortBlock;
 import edu.kit.ipd.sdq.metamodels.simulink.SingleConnection;
 import tools.vitruv.methodologisttemplate.vsum.observers.VitruvChangeTimingExtension;
-import org.junit.jupiter.api.*;
 
 class SimuLinkToAutoSARPortTest extends AbstractSimuLinkToAutoSARTest {
 	
@@ -29,8 +31,8 @@ class SimuLinkToAutoSARPortTest extends AbstractSimuLinkToAutoSARTest {
 	void testCreateInPortinBlock() {
 		createBlockInModel(DEFAULT_BLOCK_NAME);
 		viewFactory.changeSimuLinkView((view) -> {
-			var block = claimSimuLinkBlock(view, DEFAULT_BLOCK_NAME);
-			var inport = SimuLinkFactory.eINSTANCE.createInPort();
+			Block block = claimSimuLinkBlock(view, DEFAULT_BLOCK_NAME);
+			InPort inport = SimuLinkFactory.eINSTANCE.createInPort();
 			inport.setName(DEFAULT_INPORT_NAME);
 			block.getPorts().add(inport);
 		});
@@ -41,8 +43,8 @@ class SimuLinkToAutoSARPortTest extends AbstractSimuLinkToAutoSARTest {
 	void testCreateOutPortinBlock() {
 		createBlockInModel(DEFAULT_BLOCK_NAME);
 		viewFactory.changeSimuLinkView((view) -> {
-			var block = claimSimuLinkBlock(view, DEFAULT_BLOCK_NAME);
-			var outport = SimuLinkFactory.eINSTANCE.createOutPort();
+			Block block = claimSimuLinkBlock(view, DEFAULT_BLOCK_NAME);
+			OutPort outport = SimuLinkFactory.eINSTANCE.createOutPort();
 			outport.setName(DEFAULT_OUTPORT_NAME);
 			block.getPorts().add(outport);
 		});
@@ -54,8 +56,8 @@ class SimuLinkToAutoSARPortTest extends AbstractSimuLinkToAutoSARTest {
 	void testCreateInPortinSubSystem() {
 		createSubsystemInModel(DEFAULT_SUBSYSTEM_NAME);
 		viewFactory.changeSimuLinkView((view) -> {
-			var subsystem = claimSimuLinkBlock(view, DEFAULT_SUBSYSTEM_NAME);
-			var inport = SimuLinkFactory.eINSTANCE.createInPort();
+			Block subsystem = claimSimuLinkBlock(view, DEFAULT_SUBSYSTEM_NAME);
+			InPort inport = SimuLinkFactory.eINSTANCE.createInPort();
 			inport.setName(DEFAULT_INPORT_NAME);
 			subsystem.getPorts().add(inport);
 		});
@@ -66,8 +68,8 @@ class SimuLinkToAutoSARPortTest extends AbstractSimuLinkToAutoSARTest {
 	void testCreateOutPortinSubSystem() {
 		createSubsystemInModel(DEFAULT_SUBSYSTEM_NAME);
 		viewFactory.changeSimuLinkView((view) -> {
-			var subsystem = claimSimuLinkBlock(view, DEFAULT_SUBSYSTEM_NAME);
-			var outport = SimuLinkFactory.eINSTANCE.createOutPort();
+			Block subsystem = claimSimuLinkBlock(view, DEFAULT_SUBSYSTEM_NAME);
+			OutPort outport = SimuLinkFactory.eINSTANCE.createOutPort();
 			outport.setName(DEFAULT_OUTPORT_NAME);
 			subsystem.getPorts().add(outport);
 		});
@@ -78,7 +80,7 @@ class SimuLinkToAutoSARPortTest extends AbstractSimuLinkToAutoSARTest {
 	void testDeleteInPortinBlock() {
 		testCreateInPortinBlock();
 		viewFactory.changeSimuLinkView((view) -> {
-			var block = claimSimuLinkBlock(view, DEFAULT_BLOCK_NAME);
+			Block block = claimSimuLinkBlock(view, DEFAULT_BLOCK_NAME);
 			EcoreUtil.remove(claimSimuLinkPort(block, DEFAULT_INPORT_NAME));
 		});
 		validation.assertNoPortWithNameInComponent(DEFAULT_BLOCK_NAME, DEFAULT_INPORT_NAME);
@@ -88,7 +90,7 @@ class SimuLinkToAutoSARPortTest extends AbstractSimuLinkToAutoSARTest {
 	void testDeleteOutPortinSwComponent() {
 		testCreateOutPortinBlock();
 		viewFactory.changeSimuLinkView((view) -> {
-			var block = claimSimuLinkBlock(view, DEFAULT_BLOCK_NAME);
+			Block block = claimSimuLinkBlock(view, DEFAULT_BLOCK_NAME);
 			EcoreUtil.remove(claimSimuLinkPort(block, DEFAULT_OUTPORT_NAME));
 		});
 		validation.assertNoPortWithNameInComponent(DEFAULT_BLOCK_NAME, DEFAULT_OUTPORT_NAME);
@@ -104,27 +106,27 @@ class SimuLinkToAutoSARPortTest extends AbstractSimuLinkToAutoSARTest {
 	 	createOutPortBlockinModel(DEFAULT_OUTPORT_BLOCK_NAME);
 	 	createSingleConnectionInModel(DEFAULT_SINGLECONNECTION_NAME);
 		viewFactory.changeSimuLinkView((view) -> {
-	 		var block = claimSimuLinkBlock(view, DEFAULT_BLOCK_NAME);
-	 		var from = SimuLinkFactory.eINSTANCE.createOutPort();
+	 		Block block = claimSimuLinkBlock(view, DEFAULT_BLOCK_NAME);
+	 		OutPort from = SimuLinkFactory.eINSTANCE.createOutPort();
 	 		from.setName(DEFAULT_OUTPORT_NAME);
 	 		block.getPorts().add(from);
 
-	 		var subSystem = (SubSystem) claimSimuLinkBlock(view, DEFAULT_SUBSYSTEM_NAME);
+	 		SubSystem subSystem = (SubSystem) claimSimuLinkBlock(view, DEFAULT_SUBSYSTEM_NAME);
 			subSystem.getSubBlocks().add(block);
 
-			var outPortBlock = (OutPortBlock) claimSimuLinkBlock(view, DEFAULT_OUTPORT_BLOCK_NAME);
-			var outPort = SimuLinkFactory.eINSTANCE.createOutPort();
+			OutPortBlock outPortBlock = (OutPortBlock) claimSimuLinkBlock(view, DEFAULT_OUTPORT_BLOCK_NAME);
+			OutPort outPort = SimuLinkFactory.eINSTANCE.createOutPort();
 			outPort.setName(DEFAULT_SUBSYSTEM_OUTPORT_NAME);
 			outPortBlock.getPorts().add(outPort);
 
-			var to = SimuLinkFactory.eINSTANCE.createInPort();
+			InPort to = SimuLinkFactory.eINSTANCE.createInPort();
 			to.setName(DEFAULT_SUBSYSTEM_INPORT_NAME);
 			outPortBlock.getPorts().add(to);
 
 			subSystem.getSubBlocks().add(outPortBlock);
 			// inport needs to be added first because the reaction
 			// needs this port to know where the corresponding AutoSAR Typ needs to be contained
-			var singleConnection = (SingleConnection) claimSimuLinkConnection(view, DEFAULT_SINGLECONNECTION_NAME);
+			SingleConnection singleConnection = (SingleConnection) claimSimuLinkConnection(view, DEFAULT_SINGLECONNECTION_NAME);
 			singleConnection.setInport(to);
 			singleConnection.setOutport(from);
 	 	});

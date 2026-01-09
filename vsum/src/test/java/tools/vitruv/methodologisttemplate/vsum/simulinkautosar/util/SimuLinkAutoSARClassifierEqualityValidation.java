@@ -5,7 +5,6 @@ import edu.kit.ipd.sdq.metamodels.autosar.AutoSARElement;
 import edu.kit.ipd.sdq.metamodels.autosar.ProvidedPort;
 import edu.kit.ipd.sdq.metamodels.autosar.RequiredPort;
 import edu.kit.ipd.sdq.metamodels.autosar.SwComponent;
-import org.eclipse.xtend.lib.annotations.FinalFieldsConstructor;
 import edu.kit.ipd.sdq.metamodels.simulink.Block;
 import edu.kit.ipd.sdq.metamodels.simulink.InPort;
 import edu.kit.ipd.sdq.metamodels.simulink.OutPort;
@@ -17,7 +16,6 @@ import static tools.vitruv.methodologisttemplate.vsum.simulinkautosar.util.AutoS
 import static tools.vitruv.methodologisttemplate.vsum.simulinkautosar.util.SimuLinkQueryUtil.*;
 
 import java.util.Collections;
-import java.util.Set;
 import java.util.function.Consumer;
 
 import edu.kit.ipd.sdq.metamodels.autosar.CompositeSwComponent;
@@ -71,7 +69,7 @@ public class SimuLinkAutoSARClassifierEqualityValidation {
 	 * with elementName.
 	 */
 	public void assertNoElementWithNameInRootModel(String elememtName){
-viewExecutor.accept((view) -> {
+		viewExecutor.accept((view) -> {
 			assertThat("no Element in AutoSAR model with name " + elememtName + " is expected to exist",
 				AutoSARQueryUtil.claimAutoSARModel(view, AutoSARModelName)
                         .getSwcomponent()

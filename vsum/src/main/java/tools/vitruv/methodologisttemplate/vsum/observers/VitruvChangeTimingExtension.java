@@ -29,7 +29,7 @@ public class VitruvChangeTimingExtension implements
    * Name of the class extended with this extension.
    */
   private String extendedClassName;
-  public static final boolean propagateChanges = false;
+  public static final boolean propagateChanges = true;
 
   public VitruvChangeTimingExtension(String changeFilePath, String cprFilePath, String accessFilePath) {
     vitruvChangeObserver = new VitruvChangeTimeObserver();

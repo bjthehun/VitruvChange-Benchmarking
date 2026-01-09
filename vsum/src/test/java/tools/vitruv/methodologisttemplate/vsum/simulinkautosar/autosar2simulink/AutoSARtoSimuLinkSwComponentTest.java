@@ -41,7 +41,7 @@ class AutoSARtoSimuLinkSwComponentTest extends AbstractAutoSARToSimuLinkTest {
 		createCompositeSWComponentInModel(DEFAULT_COMPOSITE_COMPONENT_NAME);
 		createAtomicSWComponentInModel(DEFAULT_COMPONENT_NAME);
 		viewFactory.changeAutoSARView(view -> {
-			var atomicComponent = (AtomicSwComponent) claimAutoSARElement(view, AtomicSwComponent.class, DEFAULT_COMPONENT_NAME);
+			AtomicSwComponent atomicComponent = (AtomicSwComponent) claimAutoSARElement(view, AtomicSwComponent.class, DEFAULT_COMPONENT_NAME);
 			claimAutoSARCompositeSwComponent(view, CompositeSwComponent.class, DEFAULT_COMPOSITE_COMPONENT_NAME)
 				.getAtomicswcomponent()
 				.add(atomicComponent);
@@ -64,7 +64,7 @@ class AutoSARtoSimuLinkSwComponentTest extends AbstractAutoSARToSimuLinkTest {
 		createCompositeSWComponentInModel(DEFAULT_COMPOSITE_COMPONENT_NAME);
 		createAtomicSWComponentInModel(DEFAULT_COMPONENT_NAME);
 		viewFactory.changeAutoSARView(view -> {
-			var atomicComponent = (AtomicSwComponent) claimAutoSARElement(view, AtomicSwComponent.class, DEFAULT_COMPONENT_NAME);
+			AtomicSwComponent atomicComponent = (AtomicSwComponent) claimAutoSARElement(view, AtomicSwComponent.class, DEFAULT_COMPONENT_NAME);
 			claimAutoSARCompositeSwComponent(view, CompositeSwComponent.class, DEFAULT_COMPOSITE_COMPONENT_NAME)
 				.getAtomicswcomponent()
 				.add(atomicComponent);

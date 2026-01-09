@@ -6,7 +6,12 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
 import static tools.vitruv.methodologisttemplate.vsum.simulinkautosar.util.AutoSARQueryUtil.*;
 import edu.kit.ipd.sdq.metamodels.autosar.AtomicSwComponent;
 import edu.kit.ipd.sdq.metamodels.autosar.CompositeSwComponent;
+import edu.kit.ipd.sdq.metamodels.autosar.DelegationSwConnector;
+import edu.kit.ipd.sdq.metamodels.autosar.ProvidedPort;
+import edu.kit.ipd.sdq.metamodels.autosar.RequiredPort;
 import edu.kit.ipd.sdq.metamodels.autosar.AutoSARFactory;
+import org.junit.jupiter.api.RepetitionInfo;
+import org.junit.jupiter.api.TestInfo;
 import tools.vitruv.methodologisttemplate.vsum.observers.VitruvChangeTimingExtension;
 
 class AutoSARtoSimuLinkPortTest extends AbstractAutoSARToSimuLinkTest {
@@ -24,11 +29,12 @@ class AutoSARtoSimuLinkPortTest extends AbstractAutoSARToSimuLinkTest {
 	 */
 	 
 	@RepeatedTest(VitruvChangeTimingExtension.MEASUREMENT_RUNS)
-	void testCreateRequiredPortinSwComponent() {
+	void testCreateRequiredPortinSwComponent(RepetitionInfo repetitionInfo, TestInfo testInfo) {
 		createAtomicSWComponentInModel(DEFAULT_COMPONENT_NAME);
+		reportVSUMStatistics(repetitionInfo, testInfo);
 		viewFactory.changeAutoSARView((view) -> {
 			var atomicComponent = (AtomicSwComponent) claimAutoSARElement(view, AtomicSwComponent.class, DEFAULT_COMPONENT_NAME);
-			var port = AutoSARFactory.eINSTANCE.createRequiredPort();
+			RequiredPort port = AutoSARFactory.eINSTANCE.createRequiredPort();
 			port.setName(DEFAULT_REQUIRED_PORT_NAME);
 			atomicComponent.getPort().add(port);
 		});
@@ -42,7 +48,7 @@ class AutoSARtoSimuLinkPortTest extends AbstractAutoSARToSimuLinkTest {
 		createAtomicSWComponentInModel(DEFAULT_COMPONENT_NAME);
 		viewFactory.changeAutoSARView((view) ->{
 			var atomicComponent = (AtomicSwComponent) claimAutoSARElement(view, AtomicSwComponent.class, DEFAULT_COMPONENT_NAME);
-			var port = AutoSARFactory.eINSTANCE.createProvidedPort();
+			ProvidedPort port = AutoSARFactory.eINSTANCE.createProvidedPort();
 			port.setName(DEFAULT_PROVIDED_PORT_NAME);
 			atomicComponent.getPort().add(port);
 		});
@@ -54,7 +60,7 @@ class AutoSARtoSimuLinkPortTest extends AbstractAutoSARToSimuLinkTest {
 		createCompositeSWComponentInModel(DEFAULT_COMPOSITE_COMPONENT_NAME);
 		viewFactory.changeAutoSARView((view) ->{
 			var atomicComponent = (CompositeSwComponent) claimAutoSARElement(view, CompositeSwComponent.class, DEFAULT_COMPONENT_NAME);
-			var port = AutoSARFactory.eINSTANCE.createRequiredPort();
+			RequiredPort port = AutoSARFactory.eINSTANCE.createRequiredPort();
 			port.setName(DEFAULT_REQUIRED_PORT_NAME);
 			atomicComponent.getPort().add(port);
 		});
@@ -66,7 +72,7 @@ class AutoSARtoSimuLinkPortTest extends AbstractAutoSARToSimuLinkTest {
 		createCompositeSWComponentInModel(DEFAULT_COMPOSITE_COMPONENT_NAME);
 		viewFactory.changeAutoSARView((view) ->{
 			var atomicComponent = (CompositeSwComponent) claimAutoSARElement(view, CompositeSwComponent.class, DEFAULT_COMPONENT_NAME);
-			var port = AutoSARFactory.eINSTANCE.createProvidedPort();
+			ProvidedPort port = AutoSARFactory.eINSTANCE.createProvidedPort();
 			port.setName(DEFAULT_PROVIDED_PORT_NAME);
 			atomicComponent.getPort().add(port);
 		});
@@ -74,8 +80,8 @@ class AutoSARtoSimuLinkPortTest extends AbstractAutoSARToSimuLinkTest {
 	}
 
 	@RepeatedTest(VitruvChangeTimingExtension.MEASUREMENT_RUNS)
-	void testDeleteRequiredPortinSwComponent() {
-		testCreateRequiredPortinSwComponent();
+	void testDeleteRequiredPortinSwComponent(RepetitionInfo repetitionInfo, TestInfo testInfo) {
+		testCreateRequiredPortinSwComponent(repetitionInfo, testInfo);
 				
 		viewFactory.changeAutoSARView((view) -> {
 			var atomicComponent = claimAutoSARElement(view, AtomicSwComponent.class, DEFAULT_COMPONENT_NAME);
@@ -104,19 +110,19 @@ class AutoSARtoSimuLinkPortTest extends AbstractAutoSARToSimuLinkTest {
 		createAtomicSWComponentInModel(DEFAULT_COMPONENT_NAME);
 		
 		viewFactory.changeAutoSARView((view) -> {
-			var atomicComponent = (AtomicSwComponent) claimAutoSARElement(view, AtomicSwComponent.class, DEFAULT_COMPONENT_NAME);
+			AtomicSwComponent atomicComponent = (AtomicSwComponent) claimAutoSARElement(view, AtomicSwComponent.class, DEFAULT_COMPONENT_NAME);
 
-			var atomicOutPort = AutoSARFactory.eINSTANCE.createProvidedPort();
+			ProvidedPort atomicOutPort = AutoSARFactory.eINSTANCE.createProvidedPort();
 			atomicOutPort.setName(DEFAULT_PROVIDED_PORT_NAME);
 			atomicComponent.getPort().add(atomicOutPort);
 
-			var compositeComponent = claimAutoSARCompositeSwComponent(view, CompositeSwComponent.class, DEFAULT_COMPOSITE_COMPONENT_NAME);
-			var compositeOutPort = AutoSARFactory.eINSTANCE.createProvidedPort();
+			CompositeSwComponent compositeComponent = claimAutoSARCompositeSwComponent(view, CompositeSwComponent.class, DEFAULT_COMPOSITE_COMPONENT_NAME);
+			ProvidedPort compositeOutPort = AutoSARFactory.eINSTANCE.createProvidedPort();
 			compositeOutPort.setName(DEFAULT_REQUIREDPORT_COMPOSITE_NAME);
 			compositeComponent.getPort().add(compositeOutPort);
 			compositeComponent.getAtomicswcomponent().add(atomicComponent);
 
-			var swconnector = AutoSARFactory.eINSTANCE.createDelegationSwConnector();
+			DelegationSwConnector swconnector = AutoSARFactory.eINSTANCE.createDelegationSwConnector();
 			swconnector.setName(DEFAULT_DELAGATIONSWCONNECTOR_NAME);
 			swconnector.setInnerPort(atomicOutPort);
 			swconnector.setOuterPort(compositeOutPort);

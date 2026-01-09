@@ -19,7 +19,7 @@ abstract class AbstractAutoSARToSimuLinkTest extends SimuLinkAutoSARTransformati
 
 	protected void createAutoSARModel(Consumer<AutoSARModel> autoSARModelInitialization) {
 		viewFactory.changeAutoSARView((view) -> {
-			var autosarModel = AutoSARFactory.eINSTANCE.createAutoSARModel();
+			AutoSARModel autosarModel = AutoSARFactory.eINSTANCE.createAutoSARModel();
 			createAndRegisterRoot(view, autosarModel, getUri(getProjectModelPath(AUTOSAR_MODEL_NAME)));
 			autoSARModelInitialization.accept(autosarModel);
 		});

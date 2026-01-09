@@ -72,6 +72,7 @@ public abstract class SimuLinkAutoSARTransformationTest extends ViewBasedVitruvA
 		vitruvChangeObserver.setup("results/vitruviuschange_"+testName+".csv");
 		cprObserver.setup("results/cprs_"+testName+".csv");
 		accessObserver.setup("results/accessoperations_"+testName+".csv");
+		
 	}
 
 	protected VitruvChangeTimeObserver vitruvChangeObserver = new VitruvChangeTimeObserver();
@@ -109,15 +110,25 @@ public abstract class SimuLinkAutoSARTransformationTest extends ViewBasedVitruvA
 		}
  	}
 
-	@BeforeEach
-	final void setupViewFactory(TestInfo testInfo) {
+	protected void reportVSUMStatistics(
+        RepetitionInfo repetitionInfo,
+        TestInfo testInfo) {
+		if (repetitionInfo.getCurrentRepetition() <= VitruvChangeTimingExtension.WARM_UP_RUNS) {
+			return;
+		}
+
 		var vsum = (VirtualModelImpl) getVirtualModel();
 		var testName = getTestName(testInfo);
 		try {
 			new VSUMStatisticsObserver(vsum).writeVSUMStatistics("results/sizes_"+testName+".csv");
 		}
-		catch (IOException e) {}
+		catch (IOException ignored) {
+		}
+	}
 
+	@BeforeEach
+	final void setupViewFactory(TestInfo testInfo) {
+		var vsum = (VirtualModelImpl) getVirtualModel();
 		vsum.addChangePropagationListener(vitruvChangeObserver);
 		vsum.registerModelPersistanceObserver(accessObserver);
 		vsum.registerObserver(cprObserver);
