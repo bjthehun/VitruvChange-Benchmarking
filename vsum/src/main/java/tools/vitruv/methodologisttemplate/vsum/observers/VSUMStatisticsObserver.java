@@ -1,6 +1,8 @@
 package tools.vitruv.methodologisttemplate.vsum.observers;
 
 import org.eclipse.emf.compare.internal.conflict.AttributeChangeConflictSearch.Change;
+import org.eclipse.emf.ecore.EClass;
+import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.resource.Resource;
 
 import com.google.common.collect.Sets;
@@ -59,11 +61,24 @@ public class VSUMStatisticsObserver {
             .distinct()
             .count();
     
+        // Number of metamodel elements
+        // Assumption is for each relevant metamodel, a model exists
+        var ePackagesOfModels = viewSourceModels
+            .stream()
+            .flatMap(model -> model.getContents().stream())
+            .map(eObject -> eObject.eClass().getEPackage())
+            .distinct()
+            .toList();
+        var metamodelElementCount = ePackagesOfModels
+            .stream()
+            .map(ePackage -> countMetamodelElements(ePackage))
+            .reduce(0L, (a, b) -> a + b);
+
         // Write to File
         try (var writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(path)))) {
-            writer.write("NoOfModels, NoOfResources, NoOfCPRs, NoOfAffectedMetamodelElements");
+            writer.write("NoOfModels, NoOfResources, NoOfCPRs, NoOfAffectedMetamodelElements, NoOfAllMetamodelElements");
             writer.newLine();
-            writer.write(noOfModels + ", " + noOfResources + ", " + noOfCPRs + ", " + noOfAffectedMetamodelElements);
+            writer.write(noOfModels + ", " + noOfResources + ", " + noOfCPRs + ", " + noOfAffectedMetamodelElements + ", " + metamodelElementCount);
             writer.newLine();
             writer.flush();
         }
@@ -89,5 +104,31 @@ public class VSUMStatisticsObserver {
                 = (AbstractReactionsChangePropagationSpecification) specification;
             return new HashSet<>(reactionSpec.getReactions());
         }
+    }
+
+    /**
+     * Counts the number of metamodel elements ({@link EClass}es, {@link EAttribute}s, and {@link EReference}s)
+     * that are contained in the metaclasses of <code>package</code>, and its subpackages.
+     * Inherited EAttributes and EReferences are counted as well.
+     * 
+     * @param package - {@link EPackage}
+     * @return long
+     */
+    private long countMetamodelElements(EPackage ePackage) {
+        // Count in subpackages
+        long subpackageCount = ePackage.getESubpackages()
+            .stream()
+            .map(subPackage -> countMetamodelElements(subPackage))
+            .reduce(0L, (a, b) -> a + b);
+    
+        // Count locally
+        // Each EClass counts as model element; as does each of its EAttributes and EReferences
+        long localElementCount = ePackage.getEClassifiers()
+            .stream()
+            .filter(eClassifier -> eClassifier instanceof EClass)
+            .map(eClassifier -> (EClass) eClassifier)
+            .map(eClass -> 1L + eClass.getFeatureCount())
+            .reduce(0L, (a, b) -> a + b);
+        return subpackageCount + localElementCount;
     }
 }

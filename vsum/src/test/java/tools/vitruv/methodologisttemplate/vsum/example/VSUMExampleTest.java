@@ -116,6 +116,10 @@ public class VSUMExampleTest {
       // templateReactions.reactions#14
       Assertions.assertEquals(1, getDefaultView(vsum, List.of(Root.class)).getRootObjects().size());
     }
+    try {
+      new VSUMStatisticsObserver((VirtualModelImpl) vsum).writeVSUMStatistics("results/sizes_VSUMExampleTest.csv");
+    }
+    catch (IOException e) {}
   }
 
   @RepeatedTest(VitruvChangeTimingExtension.MEASUREMENT_RUNS)
@@ -270,10 +274,7 @@ public class VSUMExampleTest {
     model.addChangePropagationListener(vitruvChangeObserver);
     model.registerModelPersistanceObserver(accessObserver);
 
-    try {
-      new VSUMStatisticsObserver(model).writeVSUMStatistics("results/sizes_VSUMExampleTest.csv");
-    }
-    catch (IOException e) {}
+
     return model;
   }
 
